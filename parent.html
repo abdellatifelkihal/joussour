@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joussour — Espace Parent</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue-dark: #1B4F72;
+    --blue-mid: #2E86C1;
+    --blue-light: #D6EAF8;
+    --gold: #F0C040;
+    --green: #1E8449;
+    --green-light: #D5F5E3;
+    --red: #C0392B;
+    --red-light: #FDEDEC;
+    --orange: #E67E22;
+    --orange-light: #FEF9E7;
+    --bg: #F4F6F9;
+    --bg-card: #fff;
+    --border: #E2E8F0;
+    --text: #1A202C;
+    --text-muted: #718096;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+
+  /* HEADER */
+  .header {
+    background: var(--green); padding: 0 24px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); position: fixed;
+    top: 0; left: 0; right: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { width: 38px; height: 38px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { color: #fff; font-size: 17px; font-weight: 700; font-family: 'Tajawal', sans-serif; }
+  .logo-sub { color: rgba(255,255,255,0.7); font-size: 11px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.2s; }
+  .icon-btn:hover { background: rgba(255,255,255,0.25); }
+  .icon-btn i { font-size: 18px; }
+  .notif-badge { position: absolute; top: -2px; right: -2px; background: var(--gold); color: var(--blue-dark); border-radius: 50%; width: 17px; height: 17px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; }
+
+  /* BOTTOM NAV (mobile style) */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; padding: 8px 0 12px;
+    z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 16px; border-radius: var(--radius-sm); transition: all 0.15s; background: none; border: none; font-family: 'Nunito', sans-serif; }
+  .nav-item i { font-size: 22px; color: var(--text-muted); }
+  .nav-item span { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+  .nav-item.active i { color: var(--green); }
+  .nav-item.active span { color: var(--green); }
+  .nav-badge { position: absolute; top: -2px; right: -2px; background: var(--red); color: #fff; border-radius: 50%; width: 15px; height: 15px; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .nav-icon-wrap { position: relative; }
+
+  /* CONTENT */
+  .content { margin-top: 64px; margin-bottom: 80px; padding: 20px 16px; max-width: 800px; margin-left: auto; margin-right: auto; }
+
+  /* VIEWS */
+  .view { display: none; animation: fadeIn 0.25s ease; }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* CARDS */
+  .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; }
+  .card-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card-header h3 i { font-size: 18px; color: var(--green); }
+  .link-btn { background: none; border: none; color: var(--blue-mid); font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 600; }
+
+  /* WELCOME BANNER */
+  .welcome-banner {
+    background: linear-gradient(120deg, var(--green) 0%, #27AE60 100%);
+    border-radius: var(--radius); padding: 18px 20px;
+    margin-bottom: 16px; box-shadow: var(--shadow-md);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .welcome-banner h2 { color: #fff; font-size: 17px; font-weight: 700; }
+  .welcome-banner p { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 3px; }
+  .child-avatar { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; border: 2px solid rgba(255,255,255,0.4); flex-shrink: 0; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); padding: 14px 16px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: box-shadow 0.2s; }
+  .stat-card:hover { box-shadow: var(--shadow-md); }
+  .stat-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .stat-val { font-size: 22px; font-weight: 700; line-height: 1; }
+  .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  /* NOTES */
+  .note-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .note-item:last-child { border-bottom: none; }
+  .note-circle { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .note-info { flex: 1; }
+  .note-info h4 { font-size: 13px; font-weight: 700; }
+  .note-info p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .note-bar-wrap { width: 80px; }
+  .note-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+  .note-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+  /* ABSENCES */
+  .absence-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .absence-item:last-child { border-bottom: none; }
+  .abs-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .abs-info { flex: 1; }
+  .abs-info h4 { font-size: 13px; font-weight: 600; }
+  .abs-info p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .abs-badge { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 700; flex-shrink: 0; }
+
+  /* MESSAGES */
+  .msg-chat-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--bg); min-height: 300px; max-height: 400px; overflow-y: auto; }
+  .bubble-wrap { display: flex; gap: 8px; align-items: flex-end; }
+  .bubble-wrap.mine { flex-direction: row-reverse; }
+  .bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; }
+  .bubble.them { background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .bubble.mine { background: var(--green); color: #fff; border-bottom-right-radius: 4px; }
+  .bubble-time { font-size: 10px; color: var(--text-light); margin-bottom: 3px; }
+  .bubble-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--blue-light); color: var(--blue-dark); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .msg-input-area { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; }
+  .msg-input-area input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 24px; font-size: 13px; outline: none; font-family: 'Nunito', sans-serif; }
+  .msg-input-area input:focus { border-color: var(--green); }
+  .send-btn { width: 40px; height: 40px; background: var(--green); color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .send-btn i { font-size: 18px; }
+
+  /* AGENDA */
+  .agenda-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; }
+  .agenda-item:last-child { border-bottom: none; }
+  .agenda-date { width: 44px; height: 44px; background: var(--blue-light); border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+  .agenda-date .day { font-size: 16px; font-weight: 700; color: var(--blue-dark); line-height: 1; }
+  .agenda-date .month { font-size: 9px; color: var(--blue-mid); text-transform: uppercase; font-weight: 700; }
+  .agenda-info h4 { font-size: 13px; font-weight: 600; }
+  .agenda-info p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .agenda-tag { margin-left: auto; font-size: 10px; padding: 3px 9px; border-radius: 20px; font-weight: 700; flex-shrink: 0; }
+
+  /* BULLETIN */
+  .bulletin-header { padding: 16px; background: linear-gradient(120deg, var(--blue-dark), var(--blue-mid)); color: #fff; text-align: center; }
+  .bulletin-header h3 { font-size: 16px; font-weight: 700; }
+  .bulletin-header p { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+  .bulletin-avg { font-size: 32px; font-weight: 800; margin: 8px 0 4px; }
+  .bulletin-table { width: 100%; border-collapse: collapse; }
+  .bulletin-table th { padding: 10px 14px; background: var(--bg); font-size: 11px; font-weight: 700; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+  .bulletin-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .bulletin-table tr:last-child td { border-bottom: none; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 90px; right: 16px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; z-index: 300; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 8px; transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); color: #fff; }
+  .toast.info { background: var(--blue-dark); color: #fff; }
+
+  /* BTN */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; font-family: 'Nunito', sans-serif; }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-outline { background: #fff; color: var(--green); border: 1px solid var(--green); }
+  .btn i { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🌉</div>
+    <div>
+      <div class="logo-text">Joussour</div>
+      <div class="logo-sub">Espace Parent</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="icon-btn" onclick="showToast('3 notifications', 'info')">
+      <i class="ti ti-bell"></i>
+      <span class="notif-badge">3</span>
+    </button>
+    <div class="user-avatar" onclick="showToast('Mme Karimi', 'info')">MK</div>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- === ACCUEIL === -->
+  <div class="view active" id="view-accueil">
+    <div class="welcome-banner">
+      <div>
+        <h2>Bonjour, Mme Karimi 👋</h2>
+        <p>Suivez la scolarité de votre enfant</p>
+      </div>
+      <div class="child-avatar">AB</div>
+    </div>
+
+    <!-- ENFANT -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="padding:14px 16px; display:flex; align-items:center; gap:14px">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--blue-light);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">AB</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700">Anis Bouazza</div>
+          <div style="font-size:12px;color:var(--text-muted)">3ème B · École Al Farabi · Année 2024-2025</div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <span style="background:var(--green-light);color:var(--green);font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">Actif</span>
+            <span style="background:var(--blue-light);color:var(--blue-dark);font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">Semestre 2</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="padding:6px 12px;font-size:12px" onclick="navigate('bulletin')"><i class="ti ti-file-text"></i> Bulletin</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" onclick="navigate('notes')">
+        <div class="stat-icon" style="background:var(--blue-light)"><i class="ti ti-chart-bar" style="color:var(--blue-dark)"></i></div>
+        <div><div class="stat-val" style="color:var(--blue-dark)">15.2</div><div class="stat-lbl">Moyenne générale</div></div>
+      </div>
+      <div class="stat-card" onclick="navigate('absences')">
+        <div class="stat-icon" style="background:var(--red-light)"><i class="ti ti-user-x" style="color:var(--red)"></i></div>
+        <div><div class="stat-val" style="color:var(--red)">2</div><div class="stat-lbl">Absences ce mois</div></div>
+      </div>
+      <div class="stat-card" onclick="navigate('messages')">
+        <div class="stat-icon" style="background:var(--green-light)"><i class="ti ti-messages" style="color:var(--green)"></i></div>
+        <div><div class="stat-val" style="color:var(--green)">3</div><div class="stat-lbl">Messages non lus</div></div>
+      </div>
+      <div class="stat-card" onclick="navigate('agenda')">
+        <div class="stat-icon" style="background:var(--orange-light)"><i class="ti ti-calendar" style="color:var(--orange)"></i></div>
+        <div><div class="stat-val" style="color:var(--orange)">2</div><div class="stat-lbl">Événements à venir</div></div>
+      </div>
+    </div>
+
+    <!-- DERNIERES NOTES -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="ti ti-chart-bar"></i> Dernières notes</h3>
+        <button class="link-btn" onclick="navigate('notes')">Tout voir →</button>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--green-light);color:var(--green)">18</div>
+        <div class="note-info"><h4>Mathématiques</h4><p>Devoir 1 · Trimestre 2</p></div>
+        <div class="note-bar-wrap"><div class="note-bar"><div class="note-bar-fill" style="width:90%;background:var(--green)"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:right">Moy. classe: 12.4</div></div>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--blue-light);color:var(--blue-dark)">14</div>
+        <div class="note-info"><h4>Français</h4><p>Composition · Trimestre 2</p></div>
+        <div class="note-bar-wrap"><div class="note-bar"><div class="note-bar-fill" style="width:70%;background:var(--blue-mid)"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:right">Moy. classe: 11.8</div></div>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--orange-light);color:var(--orange)">11</div>
+        <div class="note-info"><h4>Histoire-Géo</h4><p>Devoir 2 · Trimestre 2</p></div>
+        <div class="note-bar-wrap"><div class="note-bar"><div class="note-bar-fill" style="width:55%;background:var(--orange)"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:3px;text-align:right">Moy. classe: 12.4</div></div>
+      </div>
+    </div>
+
+    <!-- PROCHAINS EVENEMENTS -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="ti ti-calendar"></i> Prochains événements</h3>
+        <button class="link-btn" onclick="navigate('agenda')">Tout voir →</button>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-date"><div class="day">24</div><div class="month">Mai</div></div>
+        <div class="agenda-info"><h4>Réunion parents-profs</h4><p>16h00 · Salle A12</p></div>
+        <div class="agenda-tag" style="background:var(--blue-light);color:var(--blue-dark)">Réunion</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-date"><div class="day">26</div><div class="month">Mai</div></div>
+        <div class="agenda-info"><h4>Composition de français</h4><p>08h30 · 3ème B</p></div>
+        <div class="agenda-tag" style="background:var(--orange-light);color:var(--orange)">Examen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === NOTES === -->
+  <div class="view" id="view-notes">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="font-size:20px;font-weight:700">Notes d'Anis</h2>
+      <button class="btn btn-outline" onclick="showToast('Bulletin téléchargé ✓', 'success')"><i class="ti ti-download"></i> PDF</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3><i class="ti ti-chart-bar"></i> Toutes les notes · Trimestre 2</h3></div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--green-light);color:var(--green)">18</div>
+        <div class="note-info"><h4>Mathématiques</h4><p>Devoir 1 · M. El Mansouri</p></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Moy. classe</div><div style="font-size:13px;font-weight:700">12.4</div></div>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--blue-light);color:var(--blue-dark)">14</div>
+        <div class="note-info"><h4>Français</h4><p>Composition · Mme Benali</p></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Moy. classe</div><div style="font-size:13px;font-weight:700">11.8</div></div>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--orange-light);color:var(--orange)">11</div>
+        <div class="note-info"><h4>Histoire-Géo</h4><p>Devoir 2 · M. Idrissi</p></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Moy. classe</div><div style="font-size:13px;font-weight:700">12.4</div></div>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--green-light);color:var(--green)">16</div>
+        <div class="note-info"><h4>Anglais</h4><p>Oral · Mme Chraibi</p></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Moy. classe</div><div style="font-size:13px;font-weight:700">13.1</div></div>
+      </div>
+      <div class="note-item">
+        <div class="note-circle" style="background:var(--blue-light);color:var(--blue-dark)">13</div>
+        <div class="note-info"><h4>Sciences</h4><p>TP · M. Fassi</p></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Moy. classe</div><div style="font-size:13px;font-weight:700">12.0</div></div>
+      </div>
+      <div style="padding:14px 16px;background:var(--bg);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:700;color:var(--text-muted)">Moyenne générale</span>
+        <span style="font-size:20px;font-weight:800;color:var(--green)">15.2 / 20</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- === ABSENCES === -->
+  <div class="view" id="view-absences">
+    <div style="margin-bottom:16px"><h2 style="font-size:20px;font-weight:700">Absences d'Anis</h2></div>
+    <div class="card">
+      <div class="card-header"><h3><i class="ti ti-user-x"></i> Historique des absences</h3><span style="font-size:12px;color:var(--text-muted)">Mai 2025</span></div>
+      <div class="absence-item">
+        <div class="abs-dot" style="background:var(--green)"></div>
+        <div class="abs-info"><h4>23 mai 2025</h4><p>Maladie · Justifiée par certificat médical</p></div>
+        <span class="abs-badge" style="background:var(--green-light);color:var(--green)">Justifiée</span>
+      </div>
+      <div class="absence-item">
+        <div class="abs-dot" style="background:var(--orange)"></div>
+        <div class="abs-info"><h4>15 mai 2025</h4><p>Motif non renseigné</p></div>
+        <span class="abs-badge" style="background:var(--orange-light);color:var(--orange)">En attente</span>
+      </div>
+      <div style="padding:14px 16px;background:var(--bg);display:flex;justify-content:space-between">
+        <span style="font-size:13px;color:var(--text-muted)">Total ce mois</span>
+        <span style="font-size:13px;font-weight:700">2 absences</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3><i class="ti ti-file-text"></i> Justifier une absence</h3></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Date de l'absence</label>
+          <input type="date" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Motif</label>
+          <textarea rows="3" placeholder="Expliquez le motif de l'absence..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none;resize:vertical"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Justificatif envoyé à l\'enseignant ✓', 'success')"><i class="ti ti-send"></i> Envoyer le justificatif</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === MESSAGES === -->
+  <div class="view" id="view-messages">
+    <div style="margin-bottom:16px"><h2 style="font-size:20px;font-weight:700">Messages</h2></div>
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="ti ti-messages"></i> M. El Mansouri</h3>
+        <span style="font-size:12px;color:var(--text-muted)">Professeur principal</span>
+      </div>
+      <div class="msg-chat-body" id="chatBody">
+        <div class="bubble-wrap them">
+          <div class="bubble-avatar">SM</div>
+          <div><div class="bubble-time">09:10</div><div class="bubble them">Bonjour Mme Karimi, j'espère que vous allez bien.</div></div>
+        </div>
+        <div class="bubble-wrap them">
+          <div style="width:30px;flex-shrink:0"></div>
+          <div><div class="bubble-time">09:12</div><div class="bubble them">Anis a eu 18/20 en mathématiques, félicitations à lui ! 🎉</div></div>
+        </div>
+        <div class="bubble-wrap mine">
+          <div><div class="bubble-time" style="text-align:right">09:20</div><div class="bubble mine">Merci beaucoup M. El Mansouri ! Anis travaille très bien cette année.</div></div>
+        </div>
+        <div class="bubble-wrap them">
+          <div class="bubble-avatar">SM</div>
+          <div><div class="bubble-time">09:22</div><div class="bubble them">En effet, continuez à l'encourager. La composition de français est le 26 mai.</div></div>
+        </div>
+      </div>
+      <div class="msg-input-area">
+        <input type="text" id="msgInput" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter') sendMsg()">
+        <button class="send-btn" onclick="sendMsg()"><i class="ti ti-send"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === AGENDA === -->
+  <div class="view" id="view-agenda">
+    <div style="margin-bottom:16px"><h2 style="font-size:20px;font-weight:700">Agenda de la classe</h2></div>
+    <div class="card">
+      <div class="card-header"><h3><i class="ti ti-calendar"></i> Événements à venir</h3></div>
+      <div class="agenda-item">
+        <div class="agenda-date"><div class="day">24</div><div class="month">Mai</div></div>
+        <div class="agenda-info"><h4>Réunion parents-profs</h4><p>16h00 · Salle A12 · Présence recommandée</p></div>
+        <div class="agenda-tag" style="background:var(--blue-light);color:var(--blue-dark)">Réunion</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-date"><div class="day">26</div><div class="month">Mai</div></div>
+        <div class="agenda-info"><h4>Composition de français</h4><p>08h30 · 3ème B</p></div>
+        <div class="agenda-tag" style="background:var(--orange-light);color:var(--orange)">Examen</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-date"><div class="day">30</div><div class="month">Mai</div></div>
+        <div class="agenda-info"><h4>Sortie musée archéologie</h4><p>09h00 · Autorisation requise</p></div>
+        <div class="agenda-tag" style="background:var(--green-light);color:var(--green)">Sortie</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-date"><div class="day">10</div><div class="month">Juin</div></div>
+        <div class="agenda-info"><h4>Examens de fin d'année</h4><p>Du 10 au 20 juin 2025</p></div>
+        <div class="agenda-tag" style="background:var(--red-light);color:var(--red)">Examen</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3><i class="ti ti-file-check"></i> Autorisation sortie</h3></div>
+      <div style="padding:16px">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Sortie au musée d'archéologie le 30 mai — veuillez autoriser la participation de votre enfant.</p>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="showToast('Autorisation accordée ✓', 'success')" style="flex:1"><i class="ti ti-check"></i> Autoriser</button>
+          <button class="btn btn-outline" onclick="showToast('Refus enregistré', 'info')" style="flex:1"><i class="ti ti-x"></i> Refuser</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === BULLETIN === -->
+  <div class="view" id="view-bulletin">
+    <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <h2 style="font-size:20px;font-weight:700">Bulletin scolaire</h2>
+      <button class="btn btn-outline" onclick="showToast('Bulletin PDF téléchargé ✓', 'success')"><i class="ti ti-download"></i> PDF</button>
+    </div>
+    <div class="card">
+      <div class="bulletin-header">
+        <div style="font-size:12px;opacity:0.8">École Al Farabi · Année 2024-2025</div>
+        <h3>Bulletin de notes — Trimestre 2</h3>
+        <p>Anis Bouazza · 3ème B</p>
+        <div class="bulletin-avg">15.2 / 20</div>
+        <div style="font-size:12px;opacity:0.8">Mention : Bien</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="bulletin-table">
+          <thead><tr><th>Matière</th><th>Note</th><th>Moy. classe</th><th>Appréciation</th></tr></thead>
+          <tbody>
+            <tr><td><b>Mathématiques</b></td><td style="color:var(--green);font-weight:700">18/20</td><td>12.4</td><td style="color:var(--green)">Excellent</td></tr>
+            <tr><td><b>Français</b></td><td style="color:var(--blue-mid);font-weight:700">14/20</td><td>11.8</td><td style="color:var(--blue-mid)">Bien</td></tr>
+            <tr><td><b>Histoire-Géo</b></td><td style="color:var(--orange);font-weight:700">11/20</td><td>12.4</td><td style="color:var(--orange)">Assez bien</td></tr>
+            <tr><td><b>Anglais</b></td><td style="color:var(--green);font-weight:700">16/20</td><td>13.1</td><td style="color:var(--green)">Très bien</td></tr>
+            <tr><td><b>Sciences</b></td><td style="color:var(--blue-mid);font-weight:700">13/20</td><td>12.0</td><td style="color:var(--blue-mid)">Bien</td></tr>
+            <tr style="background:var(--bg)"><td><b>Moyenne générale</b></td><td style="color:var(--green);font-weight:800;font-size:16px">15.2</td><td>12.3</td><td style="color:var(--green);font-weight:700">Bien</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:14px 16px;background:var(--bg);font-size:13px;color:var(--text-muted);border-top:1px solid var(--border)">
+        <b>Appréciation du professeur principal :</b> Anis est un élève sérieux et appliqué. Il fait preuve d'un bon niveau en mathématiques. Continuez ainsi !
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="navigate('accueil')" id="nav-accueil">
+    <div class="nav-icon-wrap"><i class="ti ti-home"></i></div>
+    <span>Accueil</span>
+  </button>
+  <button class="nav-item" onclick="navigate('notes')" id="nav-notes">
+    <div class="nav-icon-wrap"><i class="ti ti-chart-bar"></i></div>
+    <span>Notes</span>
+  </button>
+  <button class="nav-item" onclick="navigate('absences')" id="nav-absences">
+    <div class="nav-icon-wrap"><i class="ti ti-user-x"></i></div>
+    <span>Absences</span>
+  </button>
+  <button class="nav-item" onclick="navigate('messages')" id="nav-messages">
+    <div class="nav-icon-wrap">
+      <i class="ti ti-messages"></i>
+      <span class="nav-badge">3</span>
+    </div>
+    <span>Messages</span>
+  </button>
+  <button class="nav-item" onclick="navigate('agenda')" id="nav-agenda">
+    <div class="nav-icon-wrap"><i class="ti ti-calendar"></i></div>
+    <span>Agenda</span>
+  </button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg"></span></div>
+
+<script>
+function navigate(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  const nav = document.getElementById('nav-' + view);
+  if (nav) nav.classList.add('active');
+}
+
+let toastTimer;
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.className = 'toast show ' + type;
+  document.getElementById('toastMsg').textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 3000);
+}
+
+function sendMsg() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const body = document.getElementById('chatBody');
+  const now = new Date();
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap mine';
+  wrap.innerHTML = `<div><div class="bubble-time" style="text-align:right">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</div><div class="bubble mine">${text}</div></div>`;
+  body.appendChild(wrap);
+  body.scrollTop = body.scrollHeight;
+  input.value = '';
+  setTimeout(() => {
+    const resp = document.createElement('div');
+    resp.className = 'bubble-wrap them';
+    resp.innerHTML = `<div class="bubble-avatar">SM</div><div><div class="bubble-time">${now.getHours()}:${String(now.getMinutes()+1).padStart(2,'0')}</div><div class="bubble them">Merci pour votre message, je vous recontacterai rapidement.</div></div>`;
+    body.appendChild(resp);
+    body.scrollTop = body.scrollHeight;
+  }, 1200);
+}
+</script>
+</body>
+</html>

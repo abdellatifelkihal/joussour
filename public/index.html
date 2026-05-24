@@ -1264,5 +1264,27 @@ function filterThreads(v) {
   });
 }
 </script>
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5bcOBMTA2TXbfKL9wgEtGNM6gCdlsEGk",
+    authDomain: "joussour-eedb1.firebaseapp.com",
+    projectId: "joussour-eedb1",
+    storageBucket: "joussour-eedb1.firebasestorage.app",
+    messagingSenderId: "708768231158",
+    appId: "1:708768231158:web:bdc93edec08feda72706d7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  console.log("✅ Firebase connecté !");
+</script>
 </body>
 </html>

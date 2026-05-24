@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joussour — Administration</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue-dark: #1B4F72;
+    --blue-mid: #2E86C1;
+    --blue-light: #D6EAF8;
+    --gold: #F0C040;
+    --green: #1E8449;
+    --green-light: #D5F5E3;
+    --red: #C0392B;
+    --red-light: #FDEDEC;
+    --orange: #E67E22;
+    --orange-light: #FEF9E7;
+    --bg: #F4F6F9;
+    --bg-card: #fff;
+    --border: #E2E8F0;
+    --text: #1A202C;
+    --text-muted: #718096;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  .header {
+    background: var(--blue-dark); padding: 0 28px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-icon { width: 38px; height: 38px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { color: #fff; font-size: 18px; font-weight: 700; }
+  .logo-sub { color: rgba(255,255,255,0.6); font-size: 11px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.12); border: none; color: #fff;
+    padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 24px; font-weight: 700; }
+  .page-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat {
+    background: var(--bg-card); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 16px 18px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .stat-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .stat-val { font-size: 26px; font-weight: 700; }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* CARD */
+  .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header h2 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card-header h2 i { color: var(--blue-dark); font-size: 20px; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    border: none; cursor: pointer; font-size: 13px; font-weight: 600;
+    transition: all 0.15s; font-family: 'Nunito', sans-serif;
+  }
+  .btn-primary { background: var(--blue-dark); color: #fff; }
+  .btn-primary:hover { background: var(--blue-mid); }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { opacity: 0.88; }
+  .btn-outline { background: #fff; color: var(--blue-dark); border: 1px solid var(--blue-dark); }
+  .btn-outline:hover { background: var(--blue-light); }
+  .btn-danger { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; font-size: 12px; }
+  .btn-danger:hover { background: var(--red-light); }
+  .btn i { font-size: 16px; }
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* IMPORT ZONE */
+  .import-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px; text-align: center; cursor: pointer;
+    transition: all 0.2s; margin: 20px;
+  }
+  .import-zone:hover, .import-zone.drag { border-color: var(--blue-mid); background: var(--blue-light); }
+  .import-zone i { font-size: 48px; color: var(--blue-mid); margin-bottom: 12px; display: block; }
+  .import-zone h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .import-zone p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  #fileInput { display: none; }
+
+  /* TEMPLATE INFO */
+  .template-info { background: var(--blue-light); border-radius: var(--radius-sm); padding: 14px 18px; margin: 0 20px 20px; display: flex; align-items: flex-start; gap: 12px; }
+  .template-info i { color: var(--blue-dark); font-size: 20px; margin-top: 1px; flex-shrink: 0; }
+  .template-info p { font-size: 13px; color: var(--blue-dark); line-height: 1.6; }
+  .template-cols { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .col-tag { background: var(--blue-dark); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+
+  /* PREVIEW TABLE */
+  .preview-section { padding: 0 20px 20px; display: none; }
+  .preview-section.show { display: block; }
+  .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .preview-header h3 { font-size: 15px; font-weight: 700; }
+  .preview-count { background: var(--green-light); color: var(--green); font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+  .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 10px 14px; background: var(--bg); font-size: 12px; font-weight: 700; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  .avatar-cell { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
+
+  /* MANUAL FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: span 2; }
+  label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select {
+    padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 13px;
+    font-family: 'Nunito', sans-serif; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--blue-mid); }
+  .form-footer { padding: 0 20px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    padding: 12px 18px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; z-index: 300;
+    box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 8px;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); color: #fff; }
+  .toast.error { background: var(--red); color: #fff; }
+  .toast.info { background: var(--blue-dark); color: #fff; }
+
+  /* TABS */
+  .tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; }
+  .tab { padding: 12px 16px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab.active { color: var(--blue-dark); border-bottom-color: var(--blue-dark); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SEARCH BAR */
+  .search-bar { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .search-bar input { width: 100%; max-width: 340px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-family: 'Nunito', sans-serif; outline: none; }
+  .search-bar input:focus { border-color: var(--blue-mid); }
+
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="logo" href="index.html">
+    <div class="logo-icon">🌉</div>
+    <div>
+      <div class="logo-text">Joussour</div>
+      <div class="logo-sub">Administration</div>
+    </div>
+  </a>
+  <div class="header-right">
+    <a class="back-btn" href="index.html"><i class="ti ti-arrow-left"></i> Retour à la plateforme</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="page-header">
+    <h1>⚙️ Panneau d'administration</h1>
+    <p>Gérez les enseignants, les parents et les classes de Joussour</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--blue-light)"><i class="ti ti-school" style="color:var(--blue-dark)"></i></div>
+      <div><div class="stat-val" id="statEnseignants">0</div><div class="stat-lbl">Enseignants</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--green-light)"><i class="ti ti-users" style="color:var(--green)"></i></div>
+      <div><div class="stat-val" id="statParents">0</div><div class="stat-lbl">Parents</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--orange-light)"><i class="ti ti-building" style="color:var(--orange)"></i></div>
+      <div><div class="stat-val" id="statClasses">0</div><div class="stat-lbl">Classes</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon" style="background:#F3E8FF"><i class="ti ti-check" style="color:#7C3AED"></i></div>
+      <div><div class="stat-val" id="statActifs">0</div><div class="stat-lbl">Comptes actifs</div></div>
+    </div>
+  </div>
+
+  <!-- IMPORT ENSEIGNANTS -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="ti ti-file-spreadsheet"></i> Importer les enseignants</h2>
+      <button class="btn btn-outline" onclick="downloadTemplate()"><i class="ti ti-download"></i> Télécharger le modèle Excel</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('import')">📥 Importer Excel</div>
+      <div class="tab" onclick="switchTab('manual')">✏️ Ajouter manuellement</div>
+      <div class="tab" onclick="switchTab('liste')">👥 Liste des enseignants</div>
+    </div>
+
+    <!-- TAB IMPORT -->
+    <div class="tab-content active" id="tab-import">
+      <div class="template-info">
+        <i class="ti ti-info-circle"></i>
+        <div>
+          <p><strong>Format du fichier Excel requis :</strong> Votre fichier doit contenir ces colonnes dans cet ordre :</p>
+          <div class="template-cols">
+            <span class="col-tag">Nom</span>
+            <span class="col-tag">Prénom</span>
+            <span class="col-tag">Email</span>
+            <span class="col-tag">Téléphone</span>
+            <span class="col-tag">Matière</span>
+            <span class="col-tag">Classe</span>
+            <span class="col-tag">Statut</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="import-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+        ondragover="event.preventDefault(); this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <i class="ti ti-file-upload"></i>
+        <h3>Glissez votre fichier Excel ici</h3>
+        <p>ou cliquez pour parcourir vos fichiers</p>
+        <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+          <i class="ti ti-upload"></i> Choisir un fichier .xlsx
+        </button>
+        <p style="margin-top:10px;font-size:11px">Formats acceptés : .xlsx, .xls, .csv</p>
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFile(event)">
+
+      <div class="preview-section" id="previewSection">
+        <div class="preview-header">
+          <h3>Aperçu des données importées</h3>
+          <span class="preview-count" id="previewCount">0 enseignants</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Enseignant</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Matière</th>
+                <th>Classe</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="previewTbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end">
+          <button class="btn btn-outline" onclick="clearImport()"><i class="ti ti-x"></i> Annuler</button>
+          <button class="btn btn-success" onclick="confirmImport()"><i class="ti ti-check"></i> Confirmer l'import</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB MANUEL -->
+    <div class="tab-content" id="tab-manual">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" id="mNom" placeholder="Ex: El Mansouri">
+        </div>
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" id="mPrenom" placeholder="Ex: Samir">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="mEmail" placeholder="enseignant@ecole.ma">
+        </div>
+        <div class="form-group">
+          <label>Téléphone</label>
+          <input type="tel" id="mTel" placeholder="06 XX XX XX XX">
+        </div>
+        <div class="form-group">
+          <label>Matière enseignée</label>
+          <select id="mMatiere">
+            <option value="">-- Choisir --</option>
+            <option>Mathématiques</option>
+            <option>Français</option>
+            <option>Arabe</option>
+            <option>Histoire-Géographie</option>
+            <option>Sciences de la Vie</option>
+            <option>Physique-Chimie</option>
+            <option>Anglais</option>
+            <option>Éducation Islamique</option>
+            <option>Éducation Physique</option>
+            <option>Informatique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Classe assignée</label>
+          <input type="text" id="mClasse" placeholder="Ex: 3ème B">
+        </div>
+        <div class="form-group full">
+          <label>Statut</label>
+          <select id="mStatut">
+            <option>Actif</option>
+            <option>Inactif</option>
+            <option>En congé</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-outline" onclick="clearForm()"><i class="ti ti-x"></i> Effacer</button>
+        <button class="btn btn-primary" onclick="addManual()"><i class="ti ti-user-plus"></i> Ajouter l'enseignant</button>
+      </div>
+    </div>
+
+    <!-- TAB LISTE -->
+    <div class="tab-content" id="tab-liste">
+      <div class="search-bar">
+        <input type="text" placeholder="🔍  Rechercher un enseignant..." oninput="searchEnseignants(this.value)">
+      </div>
+      <div class="table-wrap" style="border:none; border-radius:0">
+        <table>
+          <thead>
+            <tr>
+              <th>Enseignant</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Matière</th>
+              <th>Classe</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="listeTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg"></span></div>
+
+<script>
+// === DATA ===
+let enseignants = [
+  {nom:'El Mansouri', prenom:'Samir', email:'s.elmansouri@ecole.ma', tel:'06 11 22 33 44', matiere:'Mathématiques', classe:'3ème B', statut:'Actif'},
+  {nom:'Benali', prenom:'Fatima', email:'f.benali@ecole.ma', tel:'06 22 33 44 55', matiere:'Français', classe:'3ème A', statut:'Actif'},
+  {nom:'Idrissi', prenom:'Youssef', email:'y.idrissi@ecole.ma', tel:'06 33 44 55 66', matiere:'Histoire-Géographie', classe:'4ème B', statut:'Actif'},
+];
+let importedData = [];
+
+const colors = ['#D6EAF8|#1B4F72','#D5F5E3|#1E8449','#FEF9E7|#B7950B','#F3E8FF|#7C3AED','#FDEDEC|#C0392B','#FEF9E7|#E67E22'];
+function getColor(i) { const c = colors[i % colors.length].split('|'); return {bg:c[0],fg:c[1]}; }
+function initials(nom, prenom) { return ((prenom||'')[0]||('')).toUpperCase() + ((nom||'')[0]||('')).toUpperCase(); }
+
+// === TOAST ===
+let toastTimer;
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.className = 'toast show ' + type;
+  document.getElementById('toastMsg').textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 3500);
+}
+
+// === TABS ===
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const tabs = ['import','manual','liste'];
+  const idx = tabs.indexOf(tab);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'liste') renderListe();
+}
+
+// === STATS ===
+function updateStats() {
+  document.getElementById('statEnseignants').textContent = enseignants.length;
+  document.getElementById('statParents').textContent = Math.floor(enseignants.length * 3.2);
+  const classes = [...new Set(enseignants.map(e => e.classe).filter(Boolean))];
+  document.getElementById('statClasses').textContent = classes.length;
+  document.getElementById('statActifs').textContent = enseignants.filter(e => e.statut === 'Actif').length;
+}
+
+// === IMPORT EXCEL ===
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+      if (rows.length < 2) { showToast('Fichier vide ou format incorrect', 'error'); return; }
+      importedData = [];
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row[0]) continue;
+        importedData.push({
+          nom: row[0] || '',
+          prenom: row[1] || '',
+          email: row[2] || '',
+          tel: row[3] || '',
+          matiere: row[4] || '',
+          classe: row[5] || '',
+          statut: row[6] || 'Actif'
+        });
+      }
+      showPreview();
+      showToast(importedData.length + ' enseignants détectés ✓', 'success');
+    } catch(err) {
+      showToast('Erreur de lecture du fichier', 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function showPreview() {
+  const tbody = document.getElementById('previewTbody');
+  tbody.innerHTML = '';
+  importedData.forEach((e, i) => {
+    const c = getColor(i);
+    const statusColors = {Actif:'var(--green-light)|var(--green)', Inactif:'#F3F4F6|#6B7280', 'En congé':'var(--orange-light)|var(--orange)'};
+    const [sbg, sfg] = (statusColors[e.statut] || statusColors.Actif).split('|');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="display:flex;align-items:center;gap:10px">
+        <div class="avatar-cell" style="background:${c.bg};color:${c.fg}">${initials(e.nom, e.prenom)}</div>
+        <div><div style="font-weight:600">${e.prenom} ${e.nom}</div></div>
+      </td>
+      <td>${e.email || '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td>${e.tel || '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td>${e.matiere || '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td>${e.classe || '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td><span class="badge" style="background:${sbg};color:${sfg}">${e.statut}</span></td>
+      <td><button class="btn-danger btn" onclick="removeImported(${i})"><i class="ti ti-trash"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('previewCount').textContent = importedData.length + ' enseignant(s)';
+  document.getElementById('previewSection').classList.add('show');
+}
+function removeImported(i) {
+  importedData.splice(i, 1);
+  if (importedData.length === 0) { clearImport(); return; }
+  showPreview();
+}
+function clearImport() {
+  importedData = [];
+  document.getElementById('previewSection').classList.remove('show');
+  document.getElementById('fileInput').value = '';
+}
+function confirmImport() {
+  enseignants = [...enseignants, ...importedData];
+  clearImport();
+  updateStats();
+  showToast(importedData.length + ' enseignants importés avec succès ✓', 'success');
+  importedData = [];
+  switchTab('liste');
+}
+
+// === MANUAL ADD ===
+function addManual() {
+  const nom = document.getElementById('mNom').value.trim();
+  const prenom = document.getElementById('mPrenom').value.trim();
+  const email = document.getElementById('mEmail').value.trim();
+  if (!nom || !prenom) { showToast('Nom et prénom requis', 'error'); return; }
+  enseignants.push({
+    nom, prenom, email,
+    tel: document.getElementById('mTel').value,
+    matiere: document.getElementById('mMatiere').value,
+    classe: document.getElementById('mClasse').value,
+    statut: document.getElementById('mStatut').value
+  });
+  clearForm();
+  updateStats();
+  showToast(prenom + ' ' + nom + ' ajouté(e) ✓', 'success');
+  switchTab('liste');
+}
+function clearForm() {
+  ['mNom','mPrenom','mEmail','mTel','mClasse'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mMatiere').value = '';
+  document.getElementById('mStatut').value = 'Actif';
+}
+
+// === LISTE ===
+function renderListe(filter='') {
+  const tbody = document.getElementById('listeTbody');
+  tbody.innerHTML = '';
+  const data = enseignants.filter(e =>
+    (e.nom+' '+e.prenom+' '+e.email+' '+e.matiere).toLowerCase().includes(filter.toLowerCase())
+  );
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Aucun enseignant trouvé</td></tr>';
+    return;
+  }
+  data.forEach((e, i) => {
+    const c = getColor(i);
+    const statusColors = {Actif:'var(--green-light)|var(--green)', Inactif:'#F3F4F6|#6B7280', 'En congé':'var(--orange-light)|var(--orange)'};
+    const [sbg, sfg] = (statusColors[e.statut] || statusColors.Actif).split('|');
+    const realIdx = enseignants.indexOf(e);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="display:flex;align-items:center;gap:10px">
+        <div class="avatar-cell" style="background:${c.bg};color:${c.fg}">${initials(e.nom, e.prenom)}</div>
+        <div><div style="font-weight:600">${e.prenom} ${e.nom}</div></div>
+      </td>
+      <td>${e.email || '—'}</td>
+      <td>${e.tel || '—'}</td>
+      <td>${e.matiere || '—'}</td>
+      <td>${e.classe || '—'}</td>
+      <td><span class="badge" style="background:${sbg};color:${sfg}">${e.statut}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="showToast('Modification à venir en v2', 'info')"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-danger" onclick="deleteEnseignant(${realIdx})"><i class="ti ti-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function searchEnseignants(v) { renderListe(v); }
+function deleteEnseignant(i) {
+  const name = enseignants[i].prenom + ' ' + enseignants[i].nom;
+  enseignants.splice(i, 1);
+  renderListe();
+  updateStats();
+  showToast(name + ' supprimé(e)', 'info');
+}
+
+// === DOWNLOAD TEMPLATE ===
+function downloadTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Nom', 'Prénom', 'Email', 'Téléphone', 'Matière', 'Classe', 'Statut'],
+    ['El Mansouri', 'Samir', 's.elmansouri@ecole.ma', '06 11 22 33 44', 'Mathématiques', '3ème B', 'Actif'],
+    ['Benali', 'Fatima', 'f.benali@ecole.ma', '06 22 33 44 55', 'Français', '3ème A', 'Actif'],
+    ['Idrissi', 'Youssef', 'y.idrissi@ecole.ma', '06 33 44 55 66', 'Histoire-Géo', '4ème B', 'Actif'],
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Enseignants');
+  XLSX.writeFile(wb, 'modele_enseignants_joussour.xlsx');
+  showToast('Modèle Excel téléchargé ✓', 'success');
+}
+
+// === INIT ===
+updateStats();
+</script>
+</body>
+</html>

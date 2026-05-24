@@ -671,8 +671,8 @@
             </div>
             <div class="msg-chat-input">
               <button class="icon-btn" style="background:var(--bg);color:var(--text-muted);border:1px solid var(--border)" onclick="showToast('Pièce jointe — fonctionnalité à venir', 'info')"><i class="ti ti-paperclip"></i></button>
-              <input type="text" id="msgInput" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter') sendMessage()">
-              <button class="send-btn" onclick="sendMessage()"><i class="ti ti-send"></i></button>
+              <input type="text" id="msgInput" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter') async function async function sendMessage() { {">
+              <button class="send-btn" onclick="async function sendMessage() {"><i class="ti ti-send"></i></button>
             </div>
           </div>
         </div>
@@ -1237,7 +1237,7 @@ function openThread(name, sub, av, bg, fg) {
   avBubble.textContent = av;
   avBubble.style.background = bg; avBubble.style.color = fg;
 }
-function sendMessage() {
+function async function sendMessage() { {
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
   if (!text) return;
@@ -1249,6 +1249,17 @@ function sendMessage() {
   body.appendChild(wrap);
   body.scrollTop = body.scrollHeight;
   input.value = '';
+  try {
+  await addDoc(collection(window.db, 'messages'), {
+    text: text,
+    from: 'enseignant',
+    timestamp: new Date(),
+    thread: document.getElementById('chatName').textContent
+  });
+  console.log('Message sauvegardé ✅');
+} catch(e) {
+  console.log('Erreur Firebase:', e);
+}
   setTimeout(() => {
     const resp = document.createElement('div');
     resp.className = 'bubble-wrap them';

@@ -332,7 +332,7 @@ let currentRole = 'enseignant';
 
 // === COMPTES DEMO ===
 const accounts = {
-  'enseignant@joussour.ma': { password: '1234', role: 'enseignant', name: 'M. Samir', redirect: 'index.html' },
+  'enseignant@joussour.ma': { password: '1234', role: 'enseignant', name: 'M. Abdellatif', redirect: 'index.html' },
   'parent@joussour.ma':     { password: '1234', role: 'parent',     name: 'Mme Karimi', redirect: 'index.html' },
   'admin@joussour.ma':      { password: 'admin1234', role: 'admin', name: 'Administrateur', redirect: 'admin.html' },
 };
@@ -387,6 +387,11 @@ function login() {
     document.getElementById('successOverlay').classList.add('show');
 
     setTimeout(() => {
+        localStorage.setItem('joussour_user', JSON.stringify({
+  name: account.name,
+  role: account.role,
+  email: email
+}));
       window.location.href = account.redirect;
     }, 2200);
   }, 1200);

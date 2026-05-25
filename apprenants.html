@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joussour — Apprenants</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1B4F72">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue-dark: #1B4F72; --blue-mid: #2E86C1; --blue-light: #D6EAF8;
+    --gold: #F0C040; --green: #1E8449; --green-light: #D5F5E3;
+    --red: #C0392B; --red-light: #FDEDEC; --orange: #E67E22;
+    --orange-light: #FEF9E7; --purple: #7C3AED; --purple-light: #F3E8FF;
+    --bg: #F4F6F9; --bg-card: #fff; --border: #E2E8F0;
+    --text: #1A202C; --text-muted: #718096; --text-light: #A0AEC0;
+    --radius: 12px; --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07); --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  .header { background: var(--blue-dark); padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.2); position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-icon { width: 38px; height: 38px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { color: #fff; font-size: 17px; font-weight: 700; }
+  .logo-sub { color: rgba(255,255,255,0.6); font-size: 11px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .back-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); border: none; color: #fff; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 600; text-decoration: none; transition: background 0.2s; }
+  .back-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 84px 20px 40px; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .page-header h1 { font-size: 24px; font-weight: 800; }
+  .page-header p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); }
+  .stat-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .stat-val { font-size: 26px; font-weight: 800; line-height: 1; }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+  /* TABS */
+  .tabs-wrap { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .tab { padding: 14px 20px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Nunito', sans-serif; }
+  .tab:hover { background: var(--bg); color: var(--blue-dark); }
+  .tab.active { color: var(--blue-dark); border-bottom-color: var(--blue-dark); background: var(--blue-light); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* CARDS */
+  .card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .card-header h3 i { color: var(--blue-dark); font-size: 18px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s; font-family: 'Nunito', sans-serif; }
+  .btn-primary { background: var(--blue-dark); color: #fff; }
+  .btn-primary:hover { background: var(--blue-mid); }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { opacity: 0.88; }
+  .btn-outline { background: #fff; color: var(--blue-dark); border: 1px solid var(--blue-dark); }
+  .btn-outline:hover { background: var(--blue-light); }
+  .btn-danger { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; font-size: 12px; }
+  .btn-danger:hover { background: var(--red-light); }
+  .btn i { font-size: 16px; }
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* IMPORT ZONE */
+  .import-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; margin: 20px; }
+  .import-zone:hover, .import-zone.drag { border-color: var(--blue-mid); background: var(--blue-light); }
+  .import-zone i { font-size: 48px; color: var(--blue-mid); margin-bottom: 12px; display: block; }
+  .import-zone h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .import-zone p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  #fileInput { display: none; }
+
+  /* TEMPLATE INFO */
+  .template-info { background: var(--blue-light); border-radius: var(--radius-sm); padding: 14px 18px; margin: 0 20px 20px; display: flex; align-items: flex-start; gap: 12px; }
+  .template-info i { color: var(--blue-dark); font-size: 20px; margin-top: 1px; flex-shrink: 0; }
+  .template-cols { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .col-tag { background: var(--blue-dark); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+
+  /* PREVIEW */
+  .preview-section { padding: 0 20px 20px; display: none; }
+  .preview-section.show { display: block; }
+  .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .preview-count { background: var(--green-light); color: var(--green); font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 10px 14px; background: var(--bg); font-size: 11px; font-weight: 700; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  .avatar-sm { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: span 2; }
+  label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Nunito', sans-serif; outline: none; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--blue-mid); }
+  .form-footer { padding: 0 20px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* MESSAGES */
+  .msg-list { }
+  .msg-item { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; cursor: pointer; transition: background 0.15s; }
+  .msg-item:last-child { border-bottom: none; }
+  .msg-item:hover { background: var(--bg); }
+  .msg-item.unread { background: #FAFBFF; border-left: 3px solid var(--blue-mid); }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-top { display: flex; justify-content: space-between; align-items: center; }
+  .msg-name { font-size: 13px; font-weight: 700; }
+  .msg-time { font-size: 11px; color: var(--text-light); }
+  .msg-preview { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .msg-subject { font-size: 12px; font-weight: 600; color: var(--blue-dark); margin-top: 2px; }
+  .unread-dot { width: 8px; height: 8px; background: var(--blue-mid); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+
+  /* REACTIONS */
+  .reaction-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px; }
+  .reaction-card { background: var(--bg); border-radius: var(--radius); padding: 16px; text-align: center; border: 1px solid var(--border); }
+  .reaction-icon { font-size: 32px; margin-bottom: 8px; }
+  .reaction-val { font-size: 28px; font-weight: 800; }
+  .reaction-lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .reaction-bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 10px; overflow: hidden; }
+  .reaction-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  /* STARS */
+  .stars { display: flex; gap: 4px; justify-content: center; margin: 8px 0; }
+  .star { font-size: 20px; color: var(--gold); }
+  .star.empty { color: var(--border); }
+
+  /* FEEDBACK LIST */
+  .feedback-item { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .feedback-item:last-child { border-bottom: none; }
+  .feedback-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .feedback-name { font-size: 13px; font-weight: 700; flex: 1; }
+  .feedback-date { font-size: 11px; color: var(--text-light); }
+  .feedback-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; background: var(--bg); padding: 10px 12px; border-radius: var(--radius-sm); }
+  .feedback-stars { display: flex; gap: 2px; }
+  .feedback-star { font-size: 14px; }
+
+  /* SEARCH */
+  .search-bar { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; }
+  .search-bar input { flex: 1; max-width: 340px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-family: 'Nunito', sans-serif; outline: none; }
+  .search-bar input:focus { border-color: var(--blue-mid); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; z-index: 300; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 8px; transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); color: #fff; }
+  .toast.info { background: var(--blue-dark); color: #fff; }
+  .toast.error { background: var(--red); color: #fff; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg-card); border-radius: var(--radius); padding: 24px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: slideUp 0.2s ease; }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .modal-header h3 { font-size: 17px; font-weight: 700; }
+  .modal-close { background: none; border: none; cursor: pointer; font-size: 20px; color: var(--text-muted); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+  /* CHAT MODAL */
+  .chat-body { background: var(--bg); padding: 16px; border-radius: var(--radius-sm); max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .bubble-wrap { display: flex; gap: 8px; align-items: flex-end; }
+  .bubble-wrap.mine { flex-direction: row-reverse; }
+  .bubble { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+  .bubble.them { background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .bubble.mine { background: var(--blue-dark); color: #fff; border-bottom-right-radius: 4px; }
+  .chat-input { display: flex; gap: 8px; }
+  .chat-input input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 24px; font-size: 13px; font-family: 'Nunito', sans-serif; outline: none; }
+  .chat-input input:focus { border-color: var(--blue-mid); }
+  .send-btn { width: 40px; height: 40px; background: var(--blue-dark); color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: span 1; }
+    .reaction-stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="logo" href="index.html">
+    <div class="logo-icon">🌉</div>
+    <div><div class="logo-text">Joussour</div><div class="logo-sub">Gestion des apprenants</div></div>
+  </a>
+  <div class="header-right">
+    <a class="back-btn" href="index.html"><i class="ti ti-arrow-left"></i> Tableau de bord</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="page-header">
+    <div>
+      <h1>👨‍🎓 Mes apprenants</h1>
+      <p>Gérez vos apprenants, messages et réactions aux cours</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-outline" onclick="downloadTemplate()"><i class="ti ti-download"></i> Modèle Excel</button>
+      <button class="btn btn-primary" onclick="switchTab('import')"><i class="ti ti-file-upload"></i> Importer Excel</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--blue-light)"><i class="ti ti-users" style="color:var(--blue-dark)"></i></div>
+      <div><div class="stat-val" id="statTotal" style="color:var(--blue-dark)">0</div><div class="stat-lbl">Apprenants</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--green-light)"><i class="ti ti-messages" style="color:var(--green)"></i></div>
+      <div><div class="stat-val" id="statMsgs" style="color:var(--green)">0</div><div class="stat-lbl">Messages reçus</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--orange-light)"><i class="ti ti-star" style="color:var(--orange)"></i></div>
+      <div><div class="stat-val" id="statAvgStar" style="color:var(--orange)">0</div><div class="stat-lbl">Note moyenne cours</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon" style="background:var(--purple-light)"><i class="ti ti-mood-smile" style="color:var(--purple)"></i></div>
+      <div><div class="stat-val" id="statLikes" style="color:var(--purple)">0%</div><div class="stat-lbl">Satisfaction</div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('liste')">👥 Liste des apprenants</button>
+      <button class="tab" onclick="switchTab('import')">📥 Importer Excel</button>
+      <button class="tab" onclick="switchTab('ajouter')">➕ Ajouter manuellement</button>
+      <button class="tab" onclick="switchTab('messages')">💬 Messages <span id="msgBadge" style="background:var(--red);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:4px;display:none">0</span></button>
+      <button class="tab" onclick="switchTab('reactions')">⭐ Réactions aux cours</button>
+    </div>
+
+    <!-- TAB LISTE -->
+    <div class="tab-content active" id="tab-liste">
+      <div class="search-bar">
+        <input type="text" placeholder="🔍  Rechercher un apprenant..." oninput="filterApprenants(this.value)">
+        <button class="btn btn-outline" style="padding:7px 12px;font-size:12px" onclick="exportListe()"><i class="ti ti-download"></i> Exporter</button>
+      </div>
+      <div class="table-wrap" style="border:none;border-radius:0">
+        <table>
+          <thead><tr><th>Apprenant</th><th>Email</th><th>Téléphone parent</th><th>Classe</th><th>Moyenne</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="listeTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB IMPORT -->
+    <div class="tab-content" id="tab-import">
+      <div class="template-info">
+        <i class="ti ti-info-circle"></i>
+        <div>
+          <p style="font-size:13px;color:var(--blue-dark)"><strong>Format Excel requis :</strong></p>
+          <div class="template-cols" style="margin-top:8px">
+            <span class="col-tag">Nom</span><span class="col-tag">Prénom</span>
+            <span class="col-tag">Email</span><span class="col-tag">Tél. Parent</span>
+            <span class="col-tag">Classe</span><span class="col-tag">Moyenne</span>
+            <span class="col-tag">Statut</span>
+          </div>
+        </div>
+      </div>
+      <div class="import-zone" id="dropZone"
+        onclick="document.getElementById('fileInput').click()"
+        ondragover="event.preventDefault(); this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <i class="ti ti-file-spreadsheet"></i>
+        <h3>Glissez votre fichier Excel ici</h3>
+        <p>ou cliquez pour parcourir vos fichiers</p>
+        <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+          <i class="ti ti-upload"></i> Choisir un fichier .xlsx
+        </button>
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFile(event)">
+      <div class="preview-section" id="previewSection">
+        <div class="preview-header">
+          <h3>Aperçu</h3>
+          <span class="preview-count" id="previewCount">0 apprenants</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom complet</th><th>Email</th><th>Tél. Parent</th><th>Classe</th><th>Moyenne</th><th>Statut</th><th>Action</th></tr></thead>
+            <tbody id="previewTbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-outline" onclick="clearImport()"><i class="ti ti-x"></i> Annuler</button>
+          <button class="btn btn-success" onclick="confirmImport()"><i class="ti ti-check"></i> Confirmer l'import</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB AJOUTER -->
+    <div class="tab-content" id="tab-ajouter">
+      <div class="form-grid">
+        <div class="form-group"><label>Nom</label><input type="text" id="aNom" placeholder="Ex: Bouazza"></div>
+        <div class="form-group"><label>Prénom</label><input type="text" id="aPrenom" placeholder="Ex: Anis"></div>
+        <div class="form-group"><label>Email apprenant</label><input type="email" id="aEmail" placeholder="apprenant@email.com"></div>
+        <div class="form-group"><label>Téléphone parent</label><input type="tel" id="aTel" placeholder="06 XX XX XX XX"></div>
+        <div class="form-group"><label>Classe</label><input type="text" id="aClasse" placeholder="Ex: 3ème B"></div>
+        <div class="form-group"><label>Moyenne générale</label><input type="number" id="aMoyenne" min="0" max="20" step="0.5" placeholder="Ex: 14.5"></div>
+        <div class="form-group full"><label>Statut</label>
+          <select id="aStatut"><option>Actif</option><option>Inactif</option><option>Redoublant</option></select>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-outline" onclick="clearForm()"><i class="ti ti-x"></i> Effacer</button>
+        <button class="btn btn-primary" onclick="addApprenant()"><i class="ti ti-user-plus"></i> Ajouter</button>
+      </div>
+    </div>
+
+    <!-- TAB MESSAGES -->
+    <div class="tab-content" id="tab-messages">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <h3 style="font-size:15px;font-weight:700">💬 Messages des apprenants</h3>
+        <button class="btn btn-outline" style="padding:6px 12px;font-size:12px" onclick="markAllRead()"><i class="ti ti-check"></i> Tout marquer lu</button>
+      </div>
+      <div class="msg-list" id="msgList"></div>
+    </div>
+
+    <!-- TAB REACTIONS -->
+    <div class="tab-content" id="tab-reactions">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <h3 style="font-size:15px;font-weight:700">⭐ Réactions aux cours</h3>
+        <select id="filterCours" onchange="filterReactions()" style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+          <option value="">Tous les cours</option>
+          <option>Mathématiques</option><option>Français</option><option>Histoire-Géo</option><option>Sciences</option><option>Anglais</option>
+        </select>
+      </div>
+
+      <!-- STATS REACTIONS -->
+      <div class="reaction-stats">
+        <div class="reaction-card">
+          <div class="reaction-icon">👍</div>
+          <div class="reaction-val" id="likeCount" style="color:var(--green)">0</div>
+          <div class="reaction-lbl">J'ai aimé le cours</div>
+          <div class="reaction-bar"><div class="reaction-bar-fill" id="likeBar" style="background:var(--green);width:0%"></div></div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-icon">👎</div>
+          <div class="reaction-val" id="dislikeCount" style="color:var(--red)">0</div>
+          <div class="reaction-lbl">Cours difficile</div>
+          <div class="reaction-bar"><div class="reaction-bar-fill" id="dislikeBar" style="background:var(--red);width:0%"></div></div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-icon">⭐</div>
+          <div class="reaction-val" id="avgStars" style="color:var(--orange)">0/5</div>
+          <div class="reaction-lbl">Note moyenne</div>
+          <div class="stars" id="avgStarsDisplay"></div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK LIST -->
+      <div style="padding:0 20px 10px;font-size:14px;font-weight:700;border-top:1px solid var(--border);padding-top:16px">
+        Commentaires des apprenants
+      </div>
+      <div id="feedbackList"></div>
+
+      <!-- SIMULER REACTION (pour test) -->
+      <div style="padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)">
+        <p style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:10px">🧪 Simuler une réaction (test)</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <select id="simCours" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+            <option>Mathématiques</option><option>Français</option><option>Histoire-Géo</option><option>Sciences</option><option>Anglais</option>
+          </select>
+          <select id="simReaction" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+            <option value="like">👍 J'ai aimé</option>
+            <option value="dislike">👎 Difficile</option>
+          </select>
+          <select id="simStars" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+            <option value="5">⭐⭐⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐</option>
+          </select>
+          <input type="text" id="simComment" placeholder="Commentaire..." style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:'Nunito',sans-serif;outline:none;flex:1;min-width:150px">
+          <button class="btn btn-primary" onclick="addReaction()"><i class="ti ti-send"></i> Envoyer</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL CHAT -->
+<div class="modal-overlay" id="chatModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="chatModalTitle">💬 Message de l'apprenant</h3>
+      <button class="modal-close" onclick="closeModal('chatModal')">×</button>
+    </div>
+    <div class="chat-body" id="chatModalBody"></div>
+    <div class="chat-input">
+      <input type="text" id="chatReply" placeholder="Votre réponse..." onkeydown="if(event.key==='Enter') sendReply()">
+      <button class="send-btn" onclick="sendReply()"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg"></span></div>
+
+<script>
+// === DATA ===
+const colors = ['#D6EAF8|#1B4F72','#D5F5E3|#1E8449','#FEF9E7|#B7950B','#F3E8FF|#7C3AED','#FDEDEC|#C0392B','#FEF9E7|#E67E22'];
+function getColor(i) { const c = colors[i%colors.length].split('|'); return {bg:c[0],fg:c[1]}; }
+function initials(nom, prenom) { return ((prenom||'')[0]||'').toUpperCase()+((nom||'')[0]||'').toUpperCase(); }
+
+let apprenants = [
+  {nom:'Bouazza',prenom:'Anis',email:'anis@email.com',tel:'06 11 22 33 44',classe:'3ème B',moyenne:15.2,statut:'Actif'},
+  {nom:'Lahlou',prenom:'Sara',email:'sara@email.com',tel:'06 22 33 44 55',classe:'3ème B',moyenne:13.8,statut:'Actif'},
+  {nom:'Chraibi',prenom:'Youssef',email:'youssef@email.com',tel:'06 33 44 55 66',classe:'3ème B',moyenne:11.5,statut:'Actif'},
+  {nom:'Ouali',prenom:'Rania',email:'rania@email.com',tel:'06 44 55 66 77',classe:'3ème B',moyenne:16.1,statut:'Actif'},
+  {nom:'Benali',prenom:'Yasmine',email:'yasmine@email.com',tel:'06 55 66 77 88',classe:'3ème B',moyenne:14.0,statut:'Actif'},
+];
+
+let messages = [
+  {from:'Anis Bouazza',avatar:'AB',bg:'#D6EAF8',fg:'#1B4F72',subject:'Question sur le devoir',text:'Bonjour professeur, je ne comprends pas l\'exercice 3 du devoir. Pouvez-vous m\'expliquer ?',time:'09:15',unread:true,replies:[]},
+  {from:'Sara Lahlou',avatar:'SL',bg:'#D5F5E3',fg:'#1E8449',subject:'Absence justifiée',text:'Bonjour, j\'étais absente hier pour raison médicale. Est-ce que je peux rattraper le cours ?',time:'hier',unread:true,replies:[]},
+  {from:'Youssef Chraibi',avatar:'YC',bg:'#FEF9E7',fg:'#B7950B',subject:'Félicitations',text:'Merci professeur pour votre explication en cours aujourd\'hui, j\'ai enfin compris !',time:'Lun',unread:false,replies:['Merci Youssef, continue comme ça !']},
+];
+
+let reactions = [
+  {from:'Anis Bouazza',cours:'Mathématiques',reaction:'like',stars:5,comment:'Très bon cours, très clair !',date:'23 mai'},
+  {from:'Sara Lahlou',cours:'Mathématiques',reaction:'like',stars:4,comment:'J\'ai bien compris la leçon.',date:'23 mai'},
+  {from:'Youssef Chraibi',cours:'Français',reaction:'dislike',stars:2,comment:'Le cours était un peu difficile à suivre.',date:'22 mai'},
+  {from:'Rania Ouali',cours:'Mathématiques',reaction:'like',stars:5,comment:'Excellent professeur !',date:'23 mai'},
+];
+
+let importedData = [];
+let currentMsgIdx = 0;
+
+// === TOAST ===
+let toastTimer;
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.className = 'toast show ' + type;
+  document.getElementById('toastMsg').textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 3500);
+}
+
+// === TABS ===
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const tabs = ['liste','import','ajouter','messages','reactions'];
+  const idx = tabs.indexOf(tab);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if(tab==='liste') renderListe();
+  if(tab==='messages') renderMessages();
+  if(tab==='reactions') renderReactions();
+}
+
+// === STATS ===
+function updateStats() {
+  document.getElementById('statTotal').textContent = apprenants.length;
+  document.getElementById('statMsgs').textContent = messages.length;
+  const unread = messages.filter(m=>m.unread).length;
+  const badge = document.getElementById('msgBadge');
+  if(unread > 0) { badge.style.display='inline'; badge.textContent=unread; }
+  else badge.style.display='none';
+  const likes = reactions.filter(r=>r.reaction==='like').length;
+  const total = reactions.length;
+  const sat = total > 0 ? Math.round(likes/total*100) : 0;
+  document.getElementById('statLikes').textContent = sat + '%';
+  const avgStar = total > 0 ? (reactions.reduce((a,r)=>a+r.stars,0)/total).toFixed(1) : 0;
+  document.getElementById('statAvgStar').textContent = avgStar + '★';
+}
+
+// === LISTE ===
+function renderListe(filter='') {
+  const tbody = document.getElementById('listeTbody');
+  tbody.innerHTML = '';
+  const data = apprenants.filter(a =>
+    (a.nom+' '+a.prenom+' '+a.email+' '+a.classe).toLowerCase().includes(filter.toLowerCase())
+  );
+  if(!data.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Aucun apprenant trouvé</td></tr>'; return; }
+  data.forEach((a,i) => {
+    const c = getColor(i);
+    const cls = a.moyenne >= 14 ? 'high' : a.moyenne >= 10 ? 'mid' : 'low';
+    const clsColors = {high:'var(--green-light)|var(--green)',mid:'var(--orange-light)|var(--orange)',low:'var(--red-light)|var(--red)'};
+    const [nbg,nfg] = clsColors[cls].split('|');
+    const statusColors = {Actif:'var(--green-light)|var(--green)',Inactif:'#F3F4F6|#6B7280',Redoublant:'var(--orange-light)|var(--orange)'};
+    const [sbg,sfg] = (statusColors[a.statut]||statusColors.Actif).split('|');
+    const realIdx = apprenants.indexOf(a);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="display:flex;align-items:center;gap:10px">
+        <div class="avatar-sm" style="background:${c.bg};color:${c.fg}">${initials(a.nom,a.prenom)}</div>
+        <div><div style="font-weight:700">${a.prenom} ${a.nom}</div><div style="font-size:11px;color:var(--text-muted)">${a.email}</div></div>
+      </td>
+      <td>${a.email}</td>
+      <td>${a.tel}</td>
+      <td>${a.classe}</td>
+      <td><span class="badge" style="background:${nbg};color:${nfg}">${a.moyenne}/20</span></td>
+      <td><span class="badge" style="background:${sbg};color:${sfg}">${a.statut}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="openChat(${messages.findIndex(m=>m.from===a.prenom+' '+a.nom)})"><i class="ti ti-message"></i></button>
+        <button class="btn btn-danger" onclick="deleteApprenant(${realIdx})"><i class="ti ti-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function filterApprenants(v) { renderListe(v); }
+function deleteApprenant(i) {
+  const name = apprenants[i].prenom+' '+apprenants[i].nom;
+  apprenants.splice(i,1);
+  renderListe(); updateStats();
+  showToast(name+' supprimé(e)', 'info');
+}
+
+// === IMPORT ===
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  processFile(e.dataTransfer.files[0]);
+}
+function handleFile(e) { processFile(e.target.files[0]); }
+function processFile(file) {
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+      if(rows.length < 2) { showToast('Fichier vide', 'error'); return; }
+      importedData = [];
+      for(let i=1; i<rows.length; i++) {
+        const r = rows[i];
+        if(!r||!r[0]) continue;
+        importedData.push({nom:r[0]||'',prenom:r[1]||'',email:r[2]||'',tel:r[3]||'',classe:r[4]||'',moyenne:r[5]||0,statut:r[6]||'Actif'});
+      }
+      showPreview();
+      showToast(importedData.length+' apprenants détectés ✓', 'success');
+    } catch(err) { showToast('Erreur de lecture', 'error'); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function showPreview() {
+  const tbody = document.getElementById('previewTbody');
+  tbody.innerHTML = '';
+  importedData.forEach((a,i) => {
+    const c = getColor(i);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="display:flex;align-items:center;gap:10px">
+        <div class="avatar-sm" style="background:${c.bg};color:${c.fg}">${initials(a.nom,a.prenom)}</div>
+        <b>${a.prenom} ${a.nom}</b>
+      </td>
+      <td>${a.email||'—'}</td><td>${a.tel||'—'}</td><td>${a.classe||'—'}</td>
+      <td>${a.moyenne||'—'}</td><td>${a.statut}</td>
+      <td><button class="btn btn-danger" onclick="removeImported(${i})"><i class="ti ti-trash"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('previewCount').textContent = importedData.length+' apprenant(s)';
+  document.getElementById('previewSection').classList.add('show');
+}
+function removeImported(i) { importedData.splice(i,1); if(!importedData.length){clearImport();return;} showPreview(); }
+function clearImport() { importedData=[]; document.getElementById('previewSection').classList.remove('show'); document.getElementById('fileInput').value=''; }
+function confirmImport() {
+  const count = importedData.length;
+  apprenants = [...apprenants, ...importedData];
+  clearImport(); updateStats(); renderListe();
+  showToast(count+' apprenants importés ✓', 'success');
+  switchTab('liste');
+}
+
+// === AJOUTER MANUELLEMENT ===
+function addApprenant() {
+  const nom = document.getElementById('aNom').value.trim();
+  const prenom = document.getElementById('aPrenom').value.trim();
+  if(!nom||!prenom) { showToast('Nom et prénom requis', 'error'); return; }
+  apprenants.push({
+    nom, prenom,
+    email: document.getElementById('aEmail').value,
+    tel: document.getElementById('aTel').value,
+    classe: document.getElementById('aClasse').value,
+    moyenne: parseFloat(document.getElementById('aMoyenne').value)||0,
+    statut: document.getElementById('aStatut').value
+  });
+  clearForm(); updateStats(); showToast(prenom+' '+nom+' ajouté(e) ✓', 'success');
+  switchTab('liste');
+}
+function clearForm() {
+  ['aNom','aPrenom','aEmail','aTel','aClasse','aMoyenne'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('aStatut').value='Actif';
+}
+
+// === MESSAGES ===
+function renderMessages() {
+  const list = document.getElementById('msgList');
+  list.innerHTML = '';
+  if(!messages.length) { list.innerHTML='<div style="text-align:center;padding:32px;color:var(--text-muted)">Aucun message reçu</div>'; return; }
+  messages.forEach((m,i) => {
+    const div = document.createElement('div');
+    div.className = 'msg-item' + (m.unread?' unread':'');
+    div.innerHTML = `
+      <div class="avatar-sm" style="background:${m.bg};color:${m.fg}">${m.avatar}</div>
+      <div class="msg-body">
+        <div class="msg-top"><span class="msg-name">${m.from}</span><span class="msg-time">${m.time}</span></div>
+        <div class="msg-subject">${m.subject}</div>
+        <div class="msg-preview">${m.text}</div>
+      </div>
+      ${m.unread ? '<div class="unread-dot"></div>' : ''}
+    `;
+    div.onclick = () => openChat(i);
+    list.appendChild(div);
+  });
+  updateStats();
+}
+function openChat(idx) {
+  if(idx < 0 || idx >= messages.length) { showToast('Ouvrez l\'onglet Messages', 'info'); return; }
+  currentMsgIdx = idx;
+  const m = messages[idx];
+  m.unread = false;
+  document.getElementById('chatModalTitle').textContent = '💬 ' + m.from + ' — ' + m.subject;
+  const body = document.getElementById('chatModalBody');
+  body.innerHTML = '';
+  // Message de l'apprenant
+  const wrap1 = document.createElement('div');
+  wrap1.className = 'bubble-wrap them';
+  wrap1.innerHTML = `<div class="avatar-sm" style="background:${m.bg};color:${m.fg};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${m.avatar}</div><div class="bubble them">${m.text}</div>`;
+  body.appendChild(wrap1);
+  // Réponses
+  m.replies.forEach(r => {
+    const wrap2 = document.createElement('div');
+    wrap2.className = 'bubble-wrap mine';
+    wrap2.innerHTML = `<div class="bubble mine">${r}</div>`;
+    body.appendChild(wrap2);
+  });
+  body.scrollTop = body.scrollHeight;
+  document.getElementById('chatModal').classList.add('open');
+  updateStats();
+}
+function sendReply() {
+  const input = document.getElementById('chatReply');
+  const text = input.value.trim();
+  if(!text) return;
+  messages[currentMsgIdx].replies.push(text);
+  const body = document.getElementById('chatModalBody');
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap mine';
+  wrap.innerHTML = `<div class="bubble mine">${text}</div>`;
+  body.appendChild(wrap);
+  body.scrollTop = body.scrollHeight;
+  input.value = '';
+  showToast('Réponse envoyée ✓', 'success');
+}
+function markAllRead() {
+  messages.forEach(m => m.unread=false);
+  renderMessages(); updateStats();
+  showToast('Tous les messages marqués comme lus ✓', 'success');
+}
+
+// === REACTIONS ===
+function renderReactions(filter='') {
+  const data = filter ? reactions.filter(r=>r.cours===filter) : reactions;
+  const likes = data.filter(r=>r.reaction==='like').length;
+  const dislikes = data.filter(r=>r.reaction==='dislike').length;
+  const total = data.length;
+  document.getElementById('likeCount').textContent = likes;
+  document.getElementById('dislikeCount').textContent = dislikes;
+  document.getElementById('likeBar').style.width = total ? (likes/total*100)+'%' : '0%';
+  document.getElementById('dislikeBar').style.width = total ? (dislikes/total*100)+'%' : '0%';
+  const avg = total ? (data.reduce((a,r)=>a+r.stars,0)/total).toFixed(1) : 0;
+  document.getElementById('avgStars').textContent = avg+'/5';
+  const starsEl = document.getElementById('avgStarsDisplay');
+  starsEl.innerHTML = '';
+  for(let i=1;i<=5;i++) {
+    const s = document.createElement('span');
+    s.className = 'star' + (i <= Math.round(avg) ? '' : ' empty');
+    s.textContent = '★';
+    starsEl.appendChild(s);
+  }
+  const feedbackList = document.getElementById('feedbackList');
+  feedbackList.innerHTML = '';
+  data.forEach((r,i) => {
+    const c = getColor(i);
+    const div = document.createElement('div');
+    div.className = 'feedback-item';
+    let starsHtml = '';
+    for(let s=1;s<=5;s++) starsHtml += `<span class="feedback-star" style="color:${s<=r.stars?'var(--gold)':'var(--border)'}">${'★'}</span>`;
+    div.innerHTML = `
+      <div class="feedback-top">
+        <div class="avatar-sm" style="background:${c.bg};color:${c.fg};width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${initials(r.from.split(' ')[1]||'',r.from.split(' ')[0]||'')}</div>
+        <div class="feedback-name">${r.from}</div>
+        <div class="feedback-stars">${starsHtml}</div>
+        <span style="background:${r.reaction==='like'?'var(--green-light)':'var(--red-light)'};color:${r.reaction==='like'?'var(--green)':'var(--red)'};font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700">${r.reaction==='like'?'👍 Aimé':'👎 Difficile'}</span>
+        <div class="feedback-date">${r.date} · ${r.cours}</div>
+      </div>
+      ${r.comment ? `<div class="feedback-text">${r.comment}</div>` : ''}
+    `;
+    feedbackList.appendChild(div);
+  });
+}
+function filterReactions() { renderReactions(document.getElementById('filterCours').value); }
+function addReaction() {
+  const cours = document.getElementById('simCours').value;
+  const reaction = document.getElementById('simReaction').value;
+  const stars = parseInt(document.getElementById('simStars').value);
+  const comment = document.getElementById('simComment').value;
+  const idx = Math.floor(Math.random()*apprenants.length);
+  const a = apprenants[idx] || {prenom:'Test',nom:'Apprenant'};
+  reactions.push({from:a.prenom+' '+a.nom, cours, reaction, stars, comment, date:'Aujourd\'hui'});
+  document.getElementById('simComment').value='';
+  renderReactions(document.getElementById('filterCours').value);
+  updateStats();
+  showToast('Réaction ajoutée ✓', 'success');
+}
+
+// === EXPORT ===
+function downloadTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Nom','Prénom','Email','Tél. Parent','Classe','Moyenne','Statut'],
+    ['Bouazza','Anis','anis@email.com','06 11 22 33 44','3ème B',15.2,'Actif'],
+    ['Lahlou','Sara','sara@email.com','06 22 33 44 55','3ème B',13.8,'Actif'],
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Apprenants');
+  XLSX.writeFile(wb, 'modele_apprenants_joussour.xlsx');
+  showToast('Modèle téléchargé ✓', 'success');
+}
+function exportListe() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Nom','Prénom','Email','Tél. Parent','Classe','Moyenne','Statut'],
+    ...apprenants.map(a=>[a.nom,a.prenom,a.email,a.tel,a.classe,a.moyenne,a.statut])
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Apprenants');
+  XLSX.writeFile(wb, 'apprenants_joussour.xlsx');
+  showToast('Liste exportée ✓', 'success');
+}
+
+// === MODAL ===
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+// === INIT ===
+updateStats();
+renderListe();
+</script>
+</body>
+</html>

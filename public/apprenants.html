@@ -195,6 +195,15 @@
     .reaction-stats { grid-template-columns: 1fr; }
   }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[dir="rtl"] { direction: rtl; }
+[dir="rtl"] .header { direction: rtl; }
+[dir="rtl"] .tabs { direction: rtl; }
+.lang-switcher-top { display: flex; gap: 6px; }
+.lang-btn { padding: 5px 12px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.1); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
+.lang-btn.active { background: #fff; color: var(--blue-dark); border-color: #fff; }
+</style>
 </head>
 <body>
 
@@ -204,6 +213,10 @@
     <div><div class="logo-text">Joussour</div><div class="logo-sub">Gestion des apprenants</div></div>
   </a>
   <div class="header-right">
+    <div class="lang-switcher-top">
+  <button class="lang-btn active" id="btn-fr" onclick="document.documentElement.dir='ltr';document.body.style.fontFamily='Nunito,sans-serif';document.getElementById('btn-fr').classList.add('active');document.getElementById('btn-ar').classList.remove('active')">FR</button>
+  <button class="lang-btn" id="btn-ar" onclick="document.documentElement.dir='rtl';document.body.style.fontFamily='Tajawal,sans-serif';document.getElementById('btn-ar').classList.add('active');document.getElementById('btn-fr').classList.remove('active')">ع</button>
+</div>
     <a class="back-btn" href="index.html"><i class="ti ti-arrow-left"></i> Tableau de bord</a>
   </div>
 </header>
@@ -422,6 +435,40 @@
 <div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg"></span></div>
 
 <script>
+    window.setLangApp = function(lang) {
+  localStorage.setItem('joussour_lang', lang);
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  document.body.style.fontFamily = lang==='ar' ? "'Tajawal', sans-serif" : "'Nunito', sans-serif";
+  document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+  document.getElementById('btn-ar').classList.toggle('active', lang==='ar');
+  const T = {
+    fr: { title:'Mes apprenants', tab_liste:'👥 Liste des apprenants', tab_import:'📥 Importer Excel', tab_ajouter:'➕ Ajouter manuellement', tab_messages:'💬 Messages', tab_reactions:'⭐ Réactions aux cours' },
+    ar: { title:'متعلميّ', tab_liste:'👥 قائمة المتعلمين', tab_import:'📥 استيراد Excel', tab_ajouter:'➕ إضافة يدوية', tab_messages:'💬 الرسائل', tab_reactions:'⭐ تفاعلات الدرس' }
+  };
+  const t = T[lang];
+  document.querySelector('.page-header h1').textContent = t.title;
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    const keys = ['tab_liste','tab_import','tab_ajouter','tab_messages','tab_reactions'];
+    if(t[keys[i]]) el.textContent = t[keys[i]];
+  });
+};
+    window.setLangApp = function(lang) {
+  localStorage.setItem('joussour_lang', lang);
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  document.body.style.fontFamily = lang==='ar' ? "'Tajawal', sans-serif" : "'Nunito', sans-serif";
+  document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+  document.getElementById('btn-ar').classList.toggle('active', lang==='ar');
+  const T = {
+    fr: { title:'Mes apprenants', tab_liste:'👥 Liste des apprenants', tab_import:'📥 Importer Excel', tab_ajouter:'➕ Ajouter manuellement', tab_messages:'💬 Messages', tab_reactions:'⭐ Réactions aux cours' },
+    ar: { title:'متعلميّ', tab_liste:'👥 قائمة المتعلمين', tab_import:'📥 استيراد Excel', tab_ajouter:'➕ إضافة يدوية', tab_messages:'💬 الرسائل', tab_reactions:'⭐ تفاعلات الدرس' }
+  };
+  const t = T[lang];
+  document.querySelector('.page-header h1').textContent = t.title;
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    const keys = ['tab_liste','tab_import','tab_ajouter','tab_messages','tab_reactions'];
+    if(t[keys[i]]) el.textContent = t[keys[i]];
+  });
+};
 // === DATA ===
 const colors = ['#D6EAF8|#1B4F72','#D5F5E3|#1E8449','#FEF9E7|#B7950B','#F3E8FF|#7C3AED','#FDEDEC|#C0392B','#FEF9E7|#E67E22'];
 function getColor(i) { const c = colors[i%colors.length].split('|'); return {bg:c[0],fg:c[1]}; }
@@ -453,6 +500,48 @@ let currentMsgIdx = 0;
 
 // === TOAST ===
 let toastTimer;
+function setLangApp(lang) {
+  localStorage.setItem('joussour_lang', lang);
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  document.body.style.fontFamily = lang==='ar' ? "'Tajawal', sans-serif" : "'Nunito', sans-serif";
+  document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+  document.getElementById('btn-ar').classList.toggle('active', lang==='ar');
+  const T = {
+    fr: {
+      title: 'Mes apprenants',
+      sub: 'Gérez vos apprenants, messages et réactions aux cours',
+      tab_liste: '👥 Liste des apprenants',
+      tab_import: '📥 Importer Excel',
+      tab_ajouter: '➕ Ajouter manuellement',
+      tab_messages: '💬 Messages',
+      tab_reactions: '⭐ Réactions aux cours',
+      stat_total: 'Apprenants',
+      stat_msgs: 'Messages reçus',
+      stat_stars: 'Note moyenne cours',
+      stat_sat: 'Satisfaction',
+      btn_import: 'Importer Excel',
+      btn_modele: 'Modèle Excel',
+    },
+    ar: {
+      title: 'متعلميّ',
+      sub: 'تدبير المتعلمين والرسائل وتفاعلات الدرس',
+      tab_liste: '👥 قائمة المتعلمين',
+      tab_import: '📥 استيراد Excel',
+      tab_ajouter: '➕ إضافة يدوية',
+      tab_messages: '💬 الرسائل',
+      tab_reactions: '⭐ تفاعلات الدرس',
+      stat_total: 'المتعلمون',
+      stat_msgs: 'الرسائل المستلمة',
+      stat_stars: 'معدل تقييم الدرس',
+      stat_sat: 'الرضا',
+      btn_import: 'استيراد Excel',
+      btn_modele: 'نموذج Excel',
+    }
+  };
+  const t = T[lang];
+  document.querySelector('.page-header h1').textContent = t.title;
+  document.querySelector('.page-header p').textContent = t.sub;
+  const tabs = docum
 function showToast(msg, type='info') {
   const t = document.getElementById('toast');
   t.className = 'toast show ' + type;
@@ -761,7 +850,7 @@ function exportListe() {
 // === MODAL ===
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
-
+window.setLangApp = setLangApp;
 // === INIT ===
 updateStats();
 renderListe();

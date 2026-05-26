@@ -1,211 +1,110 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Joussour — Connexion</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Joussour — جسور</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1B4F72">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --blue-dark: #1B4F72;
-    --blue-mid: #2E86C1;
-    --blue-light: #D6EAF8;
-    --gold: #F0C040;
-    --green: #1E8449;
-    --green-light: #D5F5E3;
-    --red: #C0392B;
-    --red-light: #FDEDEC;
-    --border: #E2E8F0;
-    --text: #1A202C;
-    --text-muted: #718096;
-    --radius: 14px;
-    --radius-sm: 8px;
-    --shadow-md: 0 8px 30px rgba(0,0,0,0.12);
+    --blue-dark: #1B4F72; --blue-mid: #2E86C1; --blue-light: #D6EAF8;
+    --gold: #F0C040; --green: #1E8449; --red: #C0392B; --red-light: #FDEDEC;
+    --border: #E2E8F0; --text: #1A202C; --text-muted: #718096;
+    --radius: 14px; --radius-sm: 8px; --shadow-md: 0 8px 30px rgba(0,0,0,0.12);
   }
   body {
-    font-family: 'Nunito', sans-serif;
-    min-height: 100vh;
+    font-family: 'Nunito', sans-serif; min-height: 100vh;
     background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 50%, #1B4F72 100%);
     display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    position: relative; overflow: hidden;
+    padding: 20px; position: relative; overflow: hidden;
   }
-
-  /* BACKGROUND DECORATION */
-  .bg-circle {
-    position: absolute; border-radius: 50%;
-    background: rgba(255,255,255,0.05);
-  }
+  [lang="ar"] body, [lang="ar"] * { font-family: 'Tajawal', sans-serif; }
+  .bg-circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.05); }
   .bg-circle.c1 { width: 400px; height: 400px; top: -100px; left: -100px; }
   .bg-circle.c2 { width: 300px; height: 300px; bottom: -80px; right: -80px; }
-  .bg-circle.c3 { width: 200px; height: 200px; top: 50%; left: 60%; }
 
-  /* MAIN CONTAINER */
-  .login-container {
-    width: 100%; max-width: 440px;
-    position: relative; z-index: 10;
-  }
+  /* LANG SWITCHER */
+  .lang-switcher { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; gap: 6px; }
+  [dir="rtl"] .lang-switcher { right: auto; left: 16px; }
+  .lang-btn { padding: 6px 14px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .lang-btn.active { background: #fff; color: var(--blue-dark); border-color: #fff; }
+  .lang-btn:hover { background: rgba(255,255,255,0.3); }
 
-  /* LOGO */
-  .logo-area {
-    text-align: center; margin-bottom: 28px;
-  }
-  .logo-icon {
-    width: 70px; height: 70px; background: var(--gold);
-    border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 32px; margin: 0 auto 14px;
-    box-shadow: 0 4px 20px rgba(240,192,64,0.4);
-  }
-  .logo-name {
-    font-family: 'Tajawal', sans-serif;
-    color: #fff; font-size: 28px; font-weight: 700; letter-spacing: 1px;
-  }
+  .login-container { width: 100%; max-width: 440px; position: relative; z-index: 10; }
+  .logo-area { text-align: center; margin-bottom: 28px; }
+  .logo-icon { width: 70px; height: 70px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 14px; box-shadow: 0 4px 20px rgba(240,192,64,0.4); }
+  .logo-name { font-family: 'Tajawal', sans-serif; color: #fff; font-size: 28px; font-weight: 700; letter-spacing: 1px; }
   .logo-slogan { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 4px; }
 
-  /* CARD */
-  .card {
-    background: #fff; border-radius: var(--radius);
-    box-shadow: var(--shadow-md); overflow: hidden;
-  }
-
-  /* ROLE SELECTOR */
-  .role-selector {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    border-bottom: 1px solid var(--border);
-  }
-  .role-btn {
-    padding: 16px 8px; text-align: center; cursor: pointer;
-    border: none; background: none; font-family: 'Nunito', sans-serif;
-    transition: all 0.2s; border-bottom: 3px solid transparent;
-    color: var(--text-muted); font-size: 13px; font-weight: 600;
-  }
+  .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; }
+  .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
+  .role-btn { padding: 16px 8px; text-align: center; cursor: pointer; border: none; background: none; font-family: inherit; transition: all 0.2s; border-bottom: 3px solid transparent; color: var(--text-muted); font-size: 13px; font-weight: 600; }
   .role-btn:hover { background: #F8FAFC; }
   .role-btn.active { color: var(--blue-dark); border-bottom-color: var(--blue-dark); background: var(--blue-light); }
   .role-btn i { display: block; font-size: 22px; margin-bottom: 5px; }
-  .role-btn.active i { color: var(--blue-dark); }
 
-  /* FORM */
   .form-area { padding: 28px; }
   .form-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
   .form-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
-
   .form-group { margin-bottom: 16px; }
-  .form-group label {
-    display: block; font-size: 12px; font-weight: 700;
-    color: var(--text-muted); text-transform: uppercase;
-    letter-spacing: 0.5px; margin-bottom: 6px;
-  }
+  .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .input-wrap { position: relative; }
-  .input-wrap i {
-    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-    font-size: 18px; color: var(--text-muted);
-  }
-  .input-wrap input {
-    width: 100%; padding: 11px 12px 11px 40px;
-    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 14px; font-family: 'Nunito', sans-serif; outline: none;
-    transition: border-color 0.2s;
-  }
+  .input-wrap .input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); }
+  [dir="rtl"] .input-wrap .input-icon { left: auto; right: 12px; }
+  .input-wrap input { width: 100%; padding: 11px 12px 11px 40px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+  [dir="rtl"] .input-wrap input { padding: 11px 40px 11px 12px; }
   .input-wrap input:focus { border-color: var(--blue-mid); }
-  .input-wrap .eye-btn {
-    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer; color: var(--text-muted);
-    font-size: 18px; left: auto;
-  }
+  .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; }
+  [dir="rtl"] .eye-btn { right: auto; left: 12px; }
 
   .forgot { text-align: right; margin-top: -8px; margin-bottom: 16px; }
+  [dir="rtl"] .forgot { text-align: left; }
   .forgot a { font-size: 12px; color: var(--blue-mid); text-decoration: none; font-weight: 600; }
-  .forgot a:hover { text-decoration: underline; }
-
-  /* REMEMBER ME */
   .remember { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-  .remember input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--blue-dark); }
-  .remember label { font-size: 13px; color: var(--text-muted); cursor: pointer; font-weight: 500; }
+  .remember input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue-dark); }
+  .remember label { font-size: 13px; color: var(--text-muted); cursor: pointer; }
 
-  /* LOGIN BTN */
-  .login-btn {
-    width: 100%; padding: 13px;
-    background: var(--blue-dark); color: #fff;
-    border: none; border-radius: var(--radius-sm);
-    font-size: 15px; font-weight: 700; cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    transition: all 0.2s; display: flex; align-items: center;
-    justify-content: center; gap: 8px;
-  }
-  .login-btn:hover { background: var(--blue-mid); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,79,114,0.3); }
-  .login-btn:active { transform: translateY(0); }
-  .login-btn i { font-size: 18px; }
+  .login-btn { width: 100%; padding: 13px; background: var(--blue-dark); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .login-btn:hover { background: var(--blue-mid); transform: translateY(-1px); }
 
-  /* DEMO CREDENTIALS */
-  .demo-section {
-    margin-top: 20px; padding: 14px; background: #F8FAFC;
-    border-radius: var(--radius-sm); border: 1px solid var(--border);
-  }
+  .demo-section { margin-top: 20px; padding: 14px; background: #F8FAFC; border-radius: var(--radius-sm); border: 1px solid var(--border); }
   .demo-section p { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-  .demo-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 0; border-bottom: 1px solid var(--border); cursor: pointer;
-    transition: background 0.15s;
-  }
+  .demo-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
   .demo-item:last-child { border-bottom: none; }
-  .demo-item:hover { background: var(--blue-light); border-radius: 4px; padding: 6px 6px; }
-  .demo-label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .demo-item:hover { background: var(--blue-light); padding: 6px; border-radius: 4px; }
+  .demo-label { font-size: 12px; font-weight: 600; }
   .demo-creds { font-size: 11px; color: var(--text-muted); font-family: monospace; }
   .demo-use { font-size: 11px; color: var(--blue-mid); font-weight: 600; }
 
-  /* ERROR MESSAGE */
-  .error-msg {
-    background: var(--red-light); color: var(--red);
-    border-radius: var(--radius-sm); padding: 10px 14px;
-    font-size: 13px; font-weight: 600; margin-bottom: 16px;
-    display: none; align-items: center; gap: 8px;
-  }
+  .error-msg { background: var(--red-light); color: var(--red); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; font-weight: 600; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
   .error-msg.show { display: flex; }
-  .error-msg i { font-size: 16px; }
 
-  /* SUCCESS */
-  .success-overlay {
-    position: fixed; inset: 0; background: var(--blue-dark);
-    display: none; align-items: center; justify-content: center;
-    flex-direction: column; gap: 16px; z-index: 100;
-  }
+  .success-overlay { position: fixed; inset: 0; background: var(--blue-dark); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 100; }
   .success-overlay.show { display: flex; animation: fadeIn 0.4s ease; }
   .success-icon { width: 80px; height: 80px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; animation: pop 0.5s ease 0.2s both; }
   @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .success-text { color: #fff; font-size: 20px; font-weight: 700; text-align: center; }
-  .success-sub { color: rgba(255,255,255,0.7); font-size: 14px; text-align: center; }
+  .success-sub { color: rgba(255,255,255,0.7); font-size: 14px; }
   .success-loader { width: 200px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; margin-top: 10px; }
   .success-loader-bar { height: 100%; background: var(--gold); border-radius: 2px; animation: load 2s linear forwards; }
   @keyframes load { from { width: 0; } to { width: 100%; } }
 
-  /* FOOTER */
-  .card-footer {
-    padding: 16px 28px; background: #F8FAFC;
-    border-top: 1px solid var(--border); text-align: center;
-    font-size: 13px; color: var(--text-muted);
-  }
+  .card-footer { padding: 16px 28px; background: #F8FAFC; border-top: 1px solid var(--border); text-align: center; font-size: 13px; color: var(--text-muted); }
   .card-footer a { color: var(--blue-mid); font-weight: 600; text-decoration: none; }
-  .card-footer a:hover { text-decoration: underline; }
-
-  /* LOADING SPINNER */
   .spinner { display: none; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1B4F72">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Joussour">
 </head>
 <body>
-
 <div class="bg-circle c1"></div>
 <div class="bg-circle c2"></div>
-<div class="bg-circle c3"></div>
 
-<!-- SUCCESS OVERLAY -->
+<!-- SUCCESS -->
 <div class="success-overlay" id="successOverlay">
   <div class="success-icon">✓</div>
   <div class="success-text" id="successText">Connexion réussie !</div>
@@ -213,224 +112,238 @@
   <div class="success-loader"><div class="success-loader-bar"></div></div>
 </div>
 
-<div class="login-container">
+<!-- LANG SWITCHER -->
+<div class="lang-switcher">
+  <button class="lang-btn active" id="btn-fr" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn" id="btn-ar" onclick="setLang('ar')">ع</button>
+</div>
 
-  <!-- LOGO -->
+<div class="login-container">
   <div class="logo-area">
     <div class="logo-icon">🌉</div>
     <div class="logo-name">جسور · Joussour</div>
-    <div class="logo-slogan">Le lien numérique entre l'école et la famille</div>
+    <div class="logo-slogan" id="slogan">Le lien numérique entre l'école et la famille</div>
   </div>
 
-  <!-- CARD -->
   <div class="card">
-
-    <!-- ROLE SELECTOR -->
     <div class="role-selector">
-      <button class="role-btn active" onclick="selectRole('enseignant')" id="role-enseignant">
-        <i class="ti ti-school"></i>
-        Enseignant
-      </button>
-      <button class="role-btn" onclick="selectRole('parent')" id="role-parent">
-        <i class="ti ti-home"></i>
-        Parent
-      </button>
-      <button class="role-btn" onclick="selectRole('admin')" id="role-admin">
-        <i class="ti ti-settings"></i>
-        Admin
-      </button>
+      <button class="role-btn active" onclick="selectRole('enseignant')" id="role-enseignant"><i class="ti ti-school"></i><span class="role-label" data-key="roleEnseignant">Enseignant</span></button>
+      <button class="role-btn" onclick="selectRole('parent')" id="role-parent"><i class="ti ti-home"></i><span class="role-label" data-key="roleParent">Parent</span></button>
+      <button class="role-btn" onclick="selectRole('admin')" id="role-admin"><i class="ti ti-settings"></i><span class="role-label" data-key="roleAdmin">Admin</span></button>
     </div>
 
-    <!-- FORM -->
     <div class="form-area">
       <div class="form-title" id="formTitle">Espace Enseignant</div>
       <div class="form-subtitle" id="formSubtitle">Connectez-vous pour accéder à votre classe</div>
+      <div class="error-msg" id="errorMsg"><i class="ti ti-alert-circle"></i><span id="errorText"></span></div>
 
-      <!-- ERROR -->
-      <div class="error-msg" id="errorMsg">
-        <i class="ti ti-alert-circle"></i>
-        <span id="errorText">Email ou mot de passe incorrect</span>
-      </div>
-
-      <!-- EMAIL -->
       <div class="form-group">
-        <label>Email</label>
+        <label id="labelEmail">Email</label>
         <div class="input-wrap">
-          <i class="ti ti-mail"></i>
+          <i class="ti ti-mail input-icon"></i>
           <input type="email" id="emailInput" placeholder="votre@email.com" onkeydown="if(event.key==='Enter') login()">
         </div>
       </div>
-
-      <!-- PASSWORD -->
       <div class="form-group">
-        <label>Mot de passe</label>
+        <label id="labelPassword">Mot de passe</label>
         <div class="input-wrap">
-          <i class="ti ti-lock"></i>
+          <i class="ti ti-lock input-icon"></i>
           <input type="password" id="passwordInput" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
-          <button class="eye-btn" onclick="togglePassword()" type="button">
-            <i class="ti ti-eye" id="eyeIcon"></i>
-          </button>
+          <button class="eye-btn" onclick="togglePassword()" type="button"><i class="ti ti-eye" id="eyeIcon"></i></button>
         </div>
       </div>
-
-      <!-- FORGOT -->
-      <div class="forgot">
-        <a href="#" onclick="showForgot()">Mot de passe oublié ?</a>
-      </div>
-
-      <!-- REMEMBER -->
+      <div class="forgot"><a href="#" id="forgotLink">Mot de passe oublié ?</a></div>
       <div class="remember">
         <input type="checkbox" id="rememberMe">
-        <label for="rememberMe">Se souvenir de moi</label>
+        <label for="rememberMe" id="rememberLabel">Se souvenir de moi</label>
       </div>
-
-      <!-- LOGIN BTN -->
       <button class="login-btn" onclick="login()" id="loginBtn">
         <span id="loginBtnText">Se connecter</span>
         <i class="ti ti-arrow-right" id="loginBtnIcon"></i>
         <div class="spinner" id="loginSpinner"></div>
       </button>
 
-      <!-- DEMO CREDENTIALS -->
       <div class="demo-section">
-        <p>🔑 Comptes de démonstration</p>
-        <div class="demo-item" onclick="fillDemo('enseignant@joussour.ma', '1234')">
-          <div>
-            <div class="demo-label">👨‍🏫 Enseignant</div>
-            <div class="demo-creds">enseignant@joussour.ma / 1234</div>
-          </div>
-          <span class="demo-use">Utiliser →</span>
+        <p id="demoTitle">🔑 Comptes de démonstration</p>
+        <div class="demo-item" onclick="fillDemo('enseignant@joussour.ma','1234')">
+          <div><div class="demo-label">👨‍🏫 <span id="demoEnseignant">Enseignant</span></div><div class="demo-creds">enseignant@joussour.ma / 1234</div></div>
+          <span class="demo-use" id="useBtn1">Utiliser →</span>
         </div>
-        <div class="demo-item" onclick="fillDemo('parent@joussour.ma', '1234')">
-          <div>
-            <div class="demo-label">👨‍👩‍👧 Parent</div>
-            <div class="demo-creds">parent@joussour.ma / 1234</div>
-          </div>
-          <span class="demo-use">Utiliser →</span>
+        <div class="demo-item" onclick="fillDemo('parent@joussour.ma','1234')">
+          <div><div class="demo-label">👨‍👩‍👧 <span id="demoParent">Parent</span></div><div class="demo-creds">parent@joussour.ma / 1234</div></div>
+          <span class="demo-use" id="useBtn2">Utiliser →</span>
         </div>
-        <div class="demo-item" onclick="fillDemo('admin@joussour.ma', 'admin1234')">
-          <div>
-            <div class="demo-label">⚙️ Administrateur</div>
-            <div class="demo-creds">admin@joussour.ma / admin1234</div>
-          </div>
-          <span class="demo-use">Utiliser →</span>
+        <div class="demo-item" onclick="fillDemo('admin@joussour.ma','admin1234')">
+          <div><div class="demo-label">⚙️ <span id="demoAdmin">Administrateur</span></div><div class="demo-creds">admin@joussour.ma / admin1234</div></div>
+          <span class="demo-use" id="useBtn3">Utiliser →</span>
         </div>
       </div>
     </div>
 
-    <!-- FOOTER -->
     <div class="card-footer">
-      Première connexion ? <a href="#" onclick="showToast()">Contactez votre administrateur</a>
+      <span id="firstLoginText">Première connexion ?</span> <a href="#" id="contactLink">Contactez votre administrateur</a>
     </div>
-
   </div>
-
 </div>
 
 <script>
+// === TRADUCTIONS ===
+const T = {
+  fr: {
+    dir: 'ltr', lang: 'fr',
+    slogan: "Le lien numérique entre l'école et la famille",
+    roleEnseignant: 'Enseignant', roleParent: 'Parent', roleAdmin: 'Admin',
+    titleEnseignant: 'Espace Enseignant', titleParent: 'Espace Parent', titleAdmin: 'Espace Administration',
+    subEnseignant: 'Connectez-vous pour accéder à votre classe',
+    subParent: 'Suivez la scolarité de votre enfant',
+    subAdmin: 'Accès réservé aux administrateurs',
+    email: 'Email', password: 'Mot de passe',
+    emailPlaceholder: 'votre@email.com',
+    forgot: 'Mot de passe oublié ?', remember: 'Se souvenir de moi',
+    loginBtn: 'Se connecter',
+    demoTitle: '🔑 Comptes de démonstration',
+    demoEnseignant: 'Enseignant', demoParent: 'Parent', demoAdmin: 'Administrateur',
+    useBtn: 'Utiliser →',
+    firstLogin: 'Première connexion ?', contactAdmin: 'Contactez votre administrateur',
+    errorEmpty: 'Veuillez saisir votre email', errorPassword: 'Veuillez saisir votre mot de passe',
+    errorWrong: 'Email ou mot de passe incorrect',
+    successMsg: 'Connexion réussie !', successSub: 'Redirection en cours...',
+  },
+  ar: {
+    dir: 'rtl', lang: 'ar',
+    slogan: 'الرابط الرقمي بين المدرسة والأسرة',
+    roleEnseignant: 'أستاذ', roleParent: 'ولي أمر', roleAdmin: 'مدير',
+    titleEnseignant: 'فضاء الأستاذ', titleParent: 'فضاء ولي الأمر', titleAdmin: 'فضاء الإدارة',
+    subEnseignant: 'سجّل دخولك للوصول إلى قسمك',
+    subParent: 'تابع مسيرة طفلك الدراسية',
+    subAdmin: 'خاص بالمسؤولين فقط',
+    email: 'البريد الإلكتروني', password: 'كلمة المرور',
+    emailPlaceholder: 'بريدك@المدرسة.ما',
+    forgot: 'نسيت كلمة المرور؟', remember: 'تذكرني',
+    loginBtn: 'تسجيل الدخول',
+    demoTitle: '🔑 حسابات تجريبية',
+    demoEnseignant: 'أستاذ', demoParent: 'ولي أمر', demoAdmin: 'مدير',
+    useBtn: '← استخدام',
+    firstLogin: 'أول مرة؟', contactAdmin: 'تواصل مع المسؤول',
+    errorEmpty: 'الرجاء إدخال بريدك الإلكتروني', errorPassword: 'الرجاء إدخال كلمة المرور',
+    errorWrong: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+    successMsg: '!تم تسجيل الدخول بنجاح', successSub: '...جاري إعادة التوجيه',
+  }
+};
+
+let currentLang = 'fr';
 let currentRole = 'enseignant';
 
-// === COMPTES DEMO ===
 const accounts = {
-  'enseignant@joussour.ma': { password: '1234', role: 'enseignant', name: 'M. Abdellatif', redirect: 'index.html' },
-  'parent@joussour.ma':     { password: '1234', role: 'parent',     name: 'Mme Karimi', redirect: 'index.html' },
-  'admin@joussour.ma':      { password: 'admin1234', role: 'admin', name: 'Administrateur', redirect: 'admin.html' },
+  'enseignant@joussour.ma': { password: '1234', role: 'enseignant', name: 'M. Abdellatif', nameAr: 'الأستاذ عبد اللطيف', redirect: 'index.html' },
+  'parent@joussour.ma':     { password: '1234', role: 'parent',     name: 'Mme Karimi',    nameAr: 'السيدة الكريمي',    redirect: 'parent.html' },
+  'admin@joussour.ma':      { password: 'admin1234', role: 'admin', name: 'Administrateur', nameAr: 'المدير',           redirect: 'admin.html' },
 };
 
-// === ROLE SELECTION ===
-const roleConfig = {
-  enseignant: { title: 'Espace Enseignant', subtitle: 'Connectez-vous pour accéder à votre classe', placeholder: 'enseignant@ecole.ma' },
-  parent:     { title: 'Espace Parent',     subtitle: 'Suivez la scolarité de votre enfant', placeholder: 'parent@email.com' },
-  admin:      { title: 'Espace Administration', subtitle: 'Accès réservé aux administrateurs', placeholder: 'admin@joussour.ma' },
-};
+function setLang(lang) {
+  currentLang = lang;
+  const t = T[lang];
+  localStorage.setItem('joussour_lang', lang);
+  document.documentElement.dir = t.dir;
+  document.documentElement.lang = lang;
+  document.body.style.fontFamily = lang === 'ar' ? "'Tajawal', sans-serif" : "'Nunito', sans-serif";
+
+  // Boutons langue
+  document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+  document.getElementById('btn-ar').classList.toggle('active', lang==='ar');
+
+  // Textes
+  document.getElementById('slogan').textContent = t.slogan;
+  document.getElementById('formTitle').textContent = t['title'+currentRole.charAt(0).toUpperCase()+currentRole.slice(1)];
+  document.getElementById('formSubtitle').textContent = t['sub'+currentRole.charAt(0).toUpperCase()+currentRole.slice(1)];
+  document.getElementById('labelEmail').textContent = t.email;
+  document.getElementById('labelPassword').textContent = t.password;
+  document.getElementById('emailInput').placeholder = t.emailPlaceholder;
+  document.getElementById('forgotLink').textContent = t.forgot;
+  document.getElementById('rememberLabel').textContent = t.remember;
+  document.getElementById('loginBtnText').textContent = t.loginBtn;
+  document.getElementById('demoTitle').textContent = t.demoTitle;
+  document.getElementById('demoEnseignant').textContent = t.demoEnseignant;
+  document.getElementById('demoParent').textContent = t.demoParent;
+  document.getElementById('demoAdmin').textContent = t.demoAdmin;
+  document.getElementById('useBtn1').textContent = t.useBtn;
+  document.getElementById('useBtn2').textContent = t.useBtn;
+  document.getElementById('useBtn3').textContent = t.useBtn;
+  document.getElementById('firstLoginText').textContent = t.firstLogin;
+  document.getElementById('contactLink').textContent = t.contactAdmin;
+
+  // Rôles
+  document.querySelectorAll('.role-label').forEach(el => {
+    const key = el.dataset.key;
+    if(key && t[key]) el.textContent = t[key];
+  });
+}
 
 function selectRole(role) {
   currentRole = role;
   document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('role-' + role).classList.add('active');
-  document.getElementById('formTitle').textContent = roleConfig[role].title;
-  document.getElementById('formSubtitle').textContent = roleConfig[role].subtitle;
-  document.getElementById('emailInput').placeholder = roleConfig[role].placeholder;
+  const t = T[currentLang];
+  const cap = role.charAt(0).toUpperCase() + role.slice(1);
+  document.getElementById('formTitle').textContent = t['title'+cap];
+  document.getElementById('formSubtitle').textContent = t['sub'+cap];
   hideError();
 }
 
-// === LOGIN ===
 function login() {
   const email = document.getElementById('emailInput').value.trim();
   const password = document.getElementById('passwordInput').value;
-
+  const t = T[currentLang];
   hideError();
+  if(!email) { showError(t.errorEmpty); return; }
+  if(!password) { showError(t.errorPassword); return; }
 
-  if (!email) { showError('Veuillez saisir votre email'); return; }
-  if (!password) { showError('Veuillez saisir votre mot de passe'); return; }
-
-  // Show loading
-  document.getElementById('loginBtnText').textContent = 'Connexion...';
+  document.getElementById('loginBtnText').textContent = currentLang==='ar' ? '...' : 'Connexion...';
   document.getElementById('loginBtnIcon').style.display = 'none';
   document.getElementById('loginSpinner').style.display = 'block';
   document.getElementById('loginBtn').disabled = true;
 
   setTimeout(() => {
     const account = accounts[email];
-    if (!account || account.password !== password) {
-      document.getElementById('loginBtnText').textContent = 'Se connecter';
+    if(!account || account.password !== password) {
+      document.getElementById('loginBtnText').textContent = t.loginBtn;
       document.getElementById('loginBtnIcon').style.display = 'block';
       document.getElementById('loginSpinner').style.display = 'none';
       document.getElementById('loginBtn').disabled = false;
-      showError('Email ou mot de passe incorrect. Utilisez un compte de démonstration.');
+      showError(t.errorWrong);
       return;
     }
-
-    // SUCCESS
-    document.getElementById('successText').textContent = 'Bienvenue, ' + account.name + ' !';
-    document.getElementById('successSub').textContent = 'Redirection vers ' + (account.role === 'admin' ? "l'administration" : "la plateforme") + '...';
+    const name = currentLang === 'ar' ? account.nameAr : account.name;
+    localStorage.setItem('joussour_user', JSON.stringify({name, role:account.role, email}));
+    document.getElementById('successText').textContent = (currentLang==='ar' ? 'مرحباً، ' : 'Bienvenue, ') + name + ' !';
+    document.getElementById('successSub').textContent = t.successSub;
     document.getElementById('successOverlay').classList.add('show');
-
-    setTimeout(() => {
-        localStorage.setItem('joussour_user', JSON.stringify({
-  name: account.name,
-  role: account.role,
-  email: email
-}));
-      window.location.href = account.redirect;
-    }, 2200);
+    setTimeout(() => { window.location.href = account.redirect; }, 2200);
   }, 1200);
 }
 
-// === HELPERS ===
-function showError(msg) {
-  document.getElementById('errorText').textContent = msg;
-  document.getElementById('errorMsg').classList.add('show');
-}
-function hideError() {
-  document.getElementById('errorMsg').classList.remove('show');
-}
+function showError(msg) { document.getElementById('errorText').textContent = msg; document.getElementById('errorMsg').classList.add('show'); }
+function hideError() { document.getElementById('errorMsg').classList.remove('show'); }
 function togglePassword() {
   const input = document.getElementById('passwordInput');
   const icon = document.getElementById('eyeIcon');
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.className = 'ti ti-eye-off';
-  } else {
-    input.type = 'password';
-    icon.className = 'ti ti-eye';
-  }
+  input.type = input.type === 'password' ? 'text' : 'password';
+  icon.className = input.type === 'password' ? 'ti ti-eye' : 'ti ti-eye-off';
 }
 function fillDemo(email, password) {
   document.getElementById('emailInput').value = email;
   document.getElementById('passwordInput').value = password;
   hideError();
-  // Auto select role
-  if (email.includes('admin')) selectRole('admin');
-  else if (email.includes('parent')) selectRole('parent');
+  if(email.includes('admin')) selectRole('admin');
+  else if(email.includes('parent')) selectRole('parent');
   else selectRole('enseignant');
 }
-function showForgot() {
-  alert('Pour réinitialiser votre mot de passe, contactez l\'administrateur de votre établissement.');
-}
-function showToast() {
-  alert('Contactez l\'administrateur : admin@joussour.ma');
-}
+
+// Init
+window.addEventListener('load', () => {
+  const savedLang = localStorage.getItem('joussour_lang') || 'fr';
+  setLang(savedLang);
+});
 </script>
 </body>
 </html>

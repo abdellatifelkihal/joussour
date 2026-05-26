@@ -179,6 +179,15 @@
 <meta name="theme-color" content="#1B4F72">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Joussour">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[dir="rtl"] { direction: rtl; }
+[dir="rtl"] .header { direction: rtl; }
+[dir="rtl"] .tabs { direction: rtl; }
+.lang-switcher-top { display: flex; gap: 6px; }
+.lang-btn { padding: 5px 12px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.1); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
+.lang-btn.active { background: #fff; color: var(--blue-dark); border-color: #fff; }
+</style>
 </head>
 <body>
 
@@ -191,6 +200,10 @@
     </div>
   </a>
   <div class="header-right">
+    <div class="lang-switcher-top">
+  <button class="lang-btn active" id="btn-fr" onclick="document.documentElement.dir='ltr';document.body.style.fontFamily='Nunito,sans-serif';document.getElementById('btn-fr').classList.add('active');document.getElementById('btn-ar').classList.remove('active')">FR</button>
+  <button class="lang-btn" id="btn-ar" onclick="document.documentElement.dir='rtl';document.body.style.fontFamily='Tajawal,sans-serif';document.getElementById('btn-ar').classList.add('active');document.getElementById('btn-fr').classList.remove('active')">ع</button>
+</div>
     <a class="back-btn" href="index.html"><i class="ti ti-arrow-left"></i> Retour à la plateforme</a>
   </div>
 </header>
@@ -588,7 +601,26 @@ function downloadTemplate() {
   XLSX.writeFile(wb, 'modele_enseignants_joussour.xlsx');
   showToast('Modèle Excel téléchargé ✓', 'success');
 }
+// TRADUCTIONS ADMIN
+document.getElementById('btn-fr').addEventListener('click', function() {
+  document.querySelector('.page-header h1').innerHTML = '⚙️ Panneau d\'administration';
+  document.querySelector('.page-header p').textContent = 'Gérez les enseignants, les parents et les classes de Joussour';
+  document.querySelector('.card-header h2').innerHTML = '<i class="ti ti-file-spreadsheet"></i> Importer les enseignants';
+  const tabs = document.querySelectorAll('.tab');
+  ['📥 Importer Excel','✏️ Ajouter manuellement','👥 Liste des enseignants'].forEach((t,i) => { if(tabs[i]) tabs[i].textContent = t; });
+  const statLabels = document.querySelectorAll('.stat-lbl');
+  ['Enseignants','Parents','Classes','Comptes actifs'].forEach((t,i) => { if(statLabels[i]) statLabels[i].textContent = t; });
+});
 
+document.getElementById('btn-ar').addEventListener('click', function() {
+  document.querySelector('.page-header h1').innerHTML = '⚙️ لوحة الإدارة';
+  document.querySelector('.page-header p').textContent = 'تدبير الأساتذة والآباء والأقسام';
+  document.querySelector('.card-header h2').innerHTML = '<i class="ti ti-file-spreadsheet"></i> استيراد الأساتذة';
+  const tabs = document.querySelectorAll('.tab');
+  ['📥 استيراد Excel','✏️ إضافة يدوية','👥 قائمة الأساتذة'].forEach((t,i) => { if(tabs[i]) tabs[i].textContent = t; });
+  const statLabels = document.querySelectorAll('.stat-lbl');
+  ['الأساتذة','الآباء','الأقسام','الحسابات النشطة'].forEach((t,i) => { if(statLabels[i]) statLabels[i].textContent = t; });
+});
 // === INIT ===
 updateStats();
 </script>

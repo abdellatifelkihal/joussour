@@ -170,6 +170,15 @@
 <meta name="theme-color" content="#1B4F72">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Joussour">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[dir="rtl"] { direction: rtl; }
+[dir="rtl"] .bottom-nav { direction: rtl; }
+[dir="rtl"] .header { direction: rtl; }
+.lang-switcher-top { display: flex; gap: 6px; }
+.lang-btn { padding: 5px 12px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.1); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
+.lang-btn.active { background: #fff; color: var(--green); border-color: #fff; }
+</style>
 </head>
 <body>
 
@@ -183,6 +192,10 @@
     </div>
   </div>
   <div class="header-right">
+    <div class="lang-switcher-top">
+  <button class="lang-btn active" id="btn-fr" onclick="setLangParent('fr')">FR</button>
+  <button class="lang-btn" id="btn-ar" onclick="setLangParent('ar')">ع</button>
+</div>
     <button class="icon-btn" onclick="showToast('3 notifications', 'info')">
       <i class="ti ti-bell"></i>
       <span class="notif-badge">3</span>
@@ -493,6 +506,49 @@
 <div class="toast" id="toast"><i class="ti ti-check"></i><span id="toastMsg"></span></div>
 
 <script>
+    function setLangParent(lang) {
+  localStorage.setItem('joussour_lang', lang);
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  document.body.style.fontFamily = lang==='ar' ? "'Tajawal', sans-serif" : "'Nunito', sans-serif";
+  document.getElementById('btn-fr').classList.toggle('active', lang==='fr');
+  document.getElementById('btn-ar').classList.toggle('active', lang==='ar');
+  const T = {
+    fr: {
+      title: 'Espace Parent',
+      welcome: 'Bonjour, Mme Karimi 👋',
+      sub: 'Suivez la scolarité de votre enfant',
+      nav_home: 'Accueil', nav_notes: 'Notes',
+      nav_absences: 'Absences', nav_messages: 'Messages', nav_agenda: 'Agenda',
+      avg: 'Moyenne générale', abs_month: 'Absences ce mois',
+      msgs: 'Messages non lus', events: 'Événements à venir',
+    },
+    ar: {
+      title: 'فضاء ولي الأمر',
+      welcome: '👋 مرحباً، السيدة الكريمي',
+      sub: 'تابع مسيرة طفلك الدراسية',
+      nav_home: 'الرئيسية', nav_notes: 'النقط',
+      nav_absences: 'الغيابات', nav_messages: 'الرسائل', nav_agenda: 'الأجندة',
+      avg: 'المعدل العام', abs_month: 'غيابات الشهر',
+      msgs: 'رسائل غير مقروءة', events: 'الأحداث القادمة',
+    }
+  };
+  const t = T[lang];
+  document.querySelector('.logo-sub').textContent = t.title;
+  document.querySelector('.welcome-banner h2').textContent = t.welcome;
+  document.querySelector('.welcome-banner p').textContent = t.sub;
+  // Nav items
+  const navItems = document.querySelectorAll('.nav-item span');
+  const keys = ['nav_home','nav_notes','nav_absences','nav_messages','nav_agenda'];
+  navItems.forEach((el,i) => { if(keys[i]) el.textContent = t[keys[i]]; });
+  // Stats
+  const statLabels = document.querySelectorAll('.stat-lbl');
+  const statKeys = ['avg','abs_month','msgs','events'];
+  statLabels.forEach((el,i) => { if(statKeys[i]) el.textContent = t[statKeys[i]]; });
+}
+
+// Charger la langue sauvegardée
+const savedLangParent = localStorage.getItem('joussour_lang') || 'fr';
+setLangParent(savedLangParent);
 function navigate(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));

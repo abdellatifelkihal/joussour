@@ -551,7 +551,7 @@ async function finishRegistration() {
 
   // Sauvegarder dans localStorage
   localStorage.setItem('joussour_user', JSON.stringify({
-    name: userData.name, role: 'enseignant', email
+    name: userData.name, role: 'enseignant', email, uid: result.uid
   }));
 
   // Afficher les codes d'accès

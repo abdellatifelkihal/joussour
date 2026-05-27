@@ -1181,7 +1181,36 @@ function sendMessage() {
     body.scrollTop = body.scrollHeight;
   }, 1200);
 }
-
+// === CHARGER LES ELEVES DEPUIS FIREBASE ===
+async function loadElevesFromFirebase() {
+  try {
+    const user = JSON.parse(localStorage.getItem('joussour_user') || '{}');
+    if(!window.db || !user.uid) return;
+    const snapshot = await window.getDocs(window.collection(window.db, 'eleves'));
+    const firebaseEleves = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if(data.enseignantId === user.uid) {
+        firebaseEleves.push({
+          name: data.name,
+          parent: data.parentTel || '—',
+          tel: data.parentTel || '—',
+          avg: data.moyenne || 0,
+          code: data.codeAccesParent
+        });
+      }
+    });
+    if(firebaseEleves.length > 0) {
+      students.length = 0;
+      firebaseEleves.forEach(e => students.push(e));
+      // Mettre à jour les stats
+      document.querySelector('#view-dashboard .stat-info .value').textContent = students.length;
+      showToast(students.length + ' élèves chargés depuis Firebase ✓', 'success');
+    }
+  } catch(err) {
+    console.log('Erreur chargement élèves:', err);
+  }
+}
 // === INIT ===
 const user = JSON.parse(localStorage.getItem('joussour_user') || '{}');
 if(user.name) document.getElementById('userAvatarEl').textContent = user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);

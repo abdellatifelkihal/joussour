@@ -1185,8 +1185,9 @@ function sendMessage() {
 async function loadElevesFromFirebase() {
   try {
     const user = JSON.parse(localStorage.getItem('joussour_user') || '{}');
-    if(!window.db || !user.uid) return;
-    const snapshot = await window.getDocs(window.collection(window.db, 'eleves'));
+    if(!window.db || !user.uid) { console.log('❌ db ou uid manquant:', user); return; }
+console.log('✅ chargement élèves pour uid:', user.uid);
+    const snapshot = await window.db.collection('eleves').where('enseignantid', '==', user.uid).get();
     const firebaseEleves = [];
     snapshot.forEach(doc => {
       const data = doc.data();
@@ -1206,6 +1207,7 @@ async function loadElevesFromFirebase() {
       // Mettre à jour les stats
       document.querySelector('#view-dashboard .stat-info .value').textContent = students.length;
       showToast(students.length + ' élèves chargés depuis Firebase ✓', 'success');
+      renderStudents();
     }
   } catch(err) {
     console.log('Erreur chargement élèves:', err);
@@ -1217,10 +1219,11 @@ if(user.name) document.getElementById('userAvatarEl').textContent = user.name.sp
 setLang(currentLang);
 </script>
 
-<!-- FIREBASE -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- FIREBASE COMPAT -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyD5bcOBMTA2TXbfKL9wgEtGNM6gCdlsEGk",
     authDomain: "joussour-eedb1.firebaseapp.com",
@@ -1229,12 +1232,9 @@ setLang(currentLang);
     messagingSenderId: "708768231158",
     appId: "1:708768231158:web:bdc93edec08feda72706d7"
   };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  window.db = db;
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.getDocs = getDocs;
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
+  window.auth = firebase.auth();
   console.log("✅ Firebase connecté !");
 </script>
 </body>

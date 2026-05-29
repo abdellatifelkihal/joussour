@@ -708,7 +708,8 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="newAnnonceModal">
+<div class="modal-overlay" id="newAnnonceModa// === CHARGER LES ELEVES DEPUIS FIREBASE ===
+async function loadElevesFromFirebase() {l">
   <div class="modal">
     <div class="modal-header"><h3><i class="ti ti-speakerphone" style="color:var(--blue-dark)"></i> <span data-i18n="new_annonce">Nouvelle annonce</span></h3><button class="modal-close" onclick="closeModal('newAnnonceModal')">×</button></div>
     <label data-i18n="title">Titre</label><input type="text" id="annonceTitle" placeholder="Titre de l'annonce">
@@ -1182,16 +1183,47 @@ function sendMessage() {
   }, 1200);
 }
 
+  try {
+    const user = JSON.parse(localStorage.getItem('joussour_user') || '{}');
+    if(!window.db || !user.uid) { console.log('❌ db ou uid manquant:', user); return; }
+console.log('✅ chargement élèves pour uid:', user.uid);
+    const snapshot = await window.db.collection('eleves').where('enseignantid', '==', user.uid).get();
+    const firebaseEleves = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if(data.enseignantId === user.uid) {
+        firebaseEleves.push({
+          name: data.name,
+          parent: data.parentTel || '—',
+          tel: data.parentTel || '—',
+          avg: data.moyenne || 0,
+          code: data.codeAccesParent
+        });
+      }
+    });
+    if(firebaseEleves.length > 0) {
+      students.length = 0;
+      firebaseEleves.forEach(e => students.push(e));
+      // Mettre à jour les stats
+      document.querySelector('#view-dashboard .stat-info .value').textContent = students.length;
+      showToast(students.length + ' élèves chargés depuis Firebase ✓', 'success');
+      renderStudents();
+    }
+  } catch(err) {
+    console.log('Erreur chargement élèves:', err);
+  }
+}
 // === INIT ===
 const user = JSON.parse(localStorage.getItem('joussour_user') || '{}');
 if(user.name) document.getElementById('userAvatarEl').textContent = user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
 setLang(currentLang);
 </script>
 
-<!-- FIREBASE -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- FIREBASE COMPAT -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyD5bcOBMTA2TXbfKL9wgEtGNM6gCdlsEGk",
     authDomain: "joussour-eedb1.firebaseapp.com",
@@ -1200,60 +1232,47 @@ setLang(currentLang);
     messagingSenderId: "708768231158",
     appId: "1:708768231158:web:bdc93edec08feda72706d7"
   };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  window.db = db;
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.getDocs = getDocs;
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
+  window.auth = firebase.auth();
   console.log("✅ Firebase connecté !");
+  
 </script>
-
 <!-- FIREBASE COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
-  if (!firebase.apps.length) {
-    firebase.initializeApp({
-      apiKey: "AIzaSyD5bcOBMTA2TXbfKL9wgEtGNM6gCdlsEGk",
-      authDomain: "joussour-eedb1.firebaseapp.com",
-      projectId: "joussour-eedb1",
-      storageBucket: "joussour-eedb1.firebasestorage.app",
-      messagingSenderId: "708768231158",
-      appId: "1:708768231158:web:bdc93edec08feda72706d7"
-    });
-  }
-  console.log("✅ Firebase connecté !");
+firebase.initializeApp({
+  apiKey: "AIzaSyD5bcOBMTA2TXbfKL9wgEtGNM6gCdlsEGk",
+  authDomain: "joussour-eedb1.firebaseapp.com",
+  projectId: "joussour-eedb1",
+  storageBucket: "joussour-eedb1.firebasestorage.app",
+  messagingSenderId: "708768231158",
+  appId: "1:708768231158:web:bdc93edec08feda72706d7"
+});
+console.log("✅ Firebase connecté !");
 
-  window.addEventListener("load", function() {
-    setTimeout(async function() {
-      try {
-        var user = JSON.parse(localStorage.getItem("joussour_user") || "{}");
-        if (!user.uid) { console.log("❌ Pas de uid"); return; }
-        console.log("🔄 Chargement élèves pour:", user.uid);
-        var snapshot = await firebase.firestore().collection("eleves").where("enseignantId", "==", user.uid).get();
-        console.log("✅ Élèves trouvés:", snapshot.size);
-        if (snapshot.size > 0) {
-          students.length = 0;
-          snapshot.forEach(function(doc) {
-            var d = doc.data();
-            students.push({
-              name: d.name || "",
-              parent: d.parentTel || "—",
-              tel: d.parentTel || "—",
-              avg: d.moyenne || 0
-            });
-          });
-          if (currentView === "eleves") renderStudents();
-          document.querySelector("#view-dashboard .stat-info .value").textContent = students.length;
-          showToast(students.length + " élèves chargés ✓", "success");
-        }
-      } catch(err) {
-        console.log("❌ Erreur Firebase:", err.message);
-      }
-    }, 2000);
-  });
+setTimeout(async function() {
+  try {
+    const user = JSON.parse(localStorage.getItem('joussour_user') || '{}');
+    if(!user.uid) { console.log('❌ Pas de uid'); return; }
+    console.log('🔄 Chargement élèves pour:', user.uid);
+    const snapshot = await firebase.firestore().collection('eleves').where('enseignantId','==',user.uid).get();
+    console.log('✅ Élèves trouvés:', snapshot.size);
+    if(snapshot.size > 0) {
+      students.length = 0;
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        students.push({ name: d.name, parent: d.parentTel||'—', tel: d.parentTel||'—', avg: d.moyenne||0 });
+      });
+      renderStudents();
+      showToast(students.length + ' élèves chargés ✓', 'success');
+    }
+  } catch(err) {
+    console.log('❌ Erreur:', err);
+  }
+}, 3000);
 </script>
 </body>
 </html>
